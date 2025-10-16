@@ -47,73 +47,113 @@ class _AppLoginState extends State<AppLogin> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Changas Ya')
+        title: const Text('Changas Ya'),
+        backgroundColor: Colors.blue,
       ),
-      body: Center( child: 
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      resizeToAvoidBottomInset: true,
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-
-            TextFormField(
-              controller: nameController,
-              onChanged: (String nameValue) {
-                if (nameController.text.isNotEmpty){
-                  setState(() {
-                    _inputName = nameController.text;
-                  });
-                }                
-              },
-              obscureText: false,
-              decoration: InputDecoration(border: OutlineInputBorder(), 
-                                          labelText: 'Usuario'),
-              autovalidateMode: AutovalidateMode.always,
-              validator: (String? text) { return validateEmail(text); }
+        
+            Container(
+              margin: const EdgeInsets.only(bottom: 20.0),
+              width: double.infinity,
+              height: 200,
+              child: Image.asset(
+                'lib/images/login_banner.png',
+                fit: BoxFit.cover),
             ),
+        
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 10.0),
+              child: TextFormField(
+                controller: nameController,
+                onChanged: (String nameValue) {
+                  if (nameController.text.isNotEmpty){
+                    setState(() {
+                      _inputName = nameController.text;
+                    });
+                  }                
+                },
+                obscureText: false,
+                decoration: InputDecoration(border: OutlineInputBorder(), 
+                                            labelText: 'E-Mail'),
+                autovalidateMode: AutovalidateMode.onUnfocus,
+                validator: (String? text) { return validateEmail(text); }
+              ),
+            ),
+        
             SizedBox(height: 20,),
-
-            TextFormField(
-              controller: passwordController,
-              onChanged: (String passwordValue) {
-                if (passwordController.text.isNotEmpty){
-                  setState(() {
-                    _inputPassword = passwordController.text;
-                  });
-                }                
-              },
-              obscureText: true,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(), 
-                labelText: 'Contraseña',
-                ),
-              autovalidateMode: AutovalidateMode.always,
-              validator: (String? password) { return validatePassword(password); },
+        
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 10.0),
+              child: TextFormField(
+                controller: passwordController,
+                onChanged: (String passwordValue) {
+                  if (passwordController.text.isNotEmpty){
+                    setState(() {
+                      _inputPassword = passwordController.text;
+                    });
+                  }                
+                },
+                obscureText: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(), 
+                  labelText: 'Contraseña',
+                  ),
+                autovalidateMode: AutovalidateMode.onUnfocus,
+                validator: (String? password) { return validatePassword(password); },
+              ),
             ),
             
+            SizedBox(height: 20.0,),
+        
+            Row(
+              mainAxisAlignment:  MainAxisAlignment.center,
+              children: [
+                FilledButton(onPressed: () {
+                  User newUser = User(_inputName, _inputPassword);
+                  if (validateData(newUser)){
+                    final snackBar = SnackBar(content: Text('LogIn Exitoso!'));
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    context.push('/jobs', extra: {newUser.name});
+                  } 
+                  
+                }, 
+                child: Text('Iniciar sesión'),
+              ),
+                
+                
+                SizedBox(width: 10.0,),
+                Text("ó"),
+                SizedBox(width: 10.0,),
+                
+                FilledButton.tonal(onPressed: () {
+                  User newUser = User(_inputName, _inputPassword);
+                  if (validateData(newUser)){
+                    context.push('/jobs', extra: {newUser.name});
+                  } 
+                }, child: Text('Registarse')),
+              ],
+            ),
 
-            ElevatedButton(onPressed: () {
-              User newUser = User(_inputName, _inputPassword);
-              if (validateData(newUser)){
-                final snackBar = SnackBar(content: Text('LogIn Exitoso!'));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                context.push('/jobs', extra: {newUser.name});
-              } 
+            SizedBox(height: 30.0,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Instituto Tecnológico ORT  2025',
+                  style: TextStyle(fontSize: 12.0,),          
+                  ),
+                  //TextButton(onPressed: () => { context.push(/nosotros)}, child: Text("Nosotros")),
+                  TextButton(onPressed: (){}, child: Text("Nosotros", style: TextStyle(fontSize: 12.0),))
+              ]
               
-            }, child: Text('Iniciar sesión')),
-            
-            SizedBox(height: 10,),
-            Text("ó"),
-            SizedBox(height: 10,),
-
-            ElevatedButton(onPressed: () {
-              User newUser = User(_inputName, _inputPassword);
-              if (validateData(newUser)){
-                context.push('/jobs', extra: {newUser.name});
-              } 
-              
-            }, child: Text('Registarse')),
+            )
           ],
         ),
-    ),
+      ),
     );
     
   }
