@@ -24,6 +24,8 @@ class _AppSignUp extends State<SignUp> {
   String _inputEmail = '';
   String _inputPassword = '';
   String _inputConfirmedPassword = '';
+  
+  SnackBar snackBar = SnackBar(content: Text('Usuario registrado'));
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +103,7 @@ class _AppSignUp extends State<SignUp> {
                   border: OutlineInputBorder(), 
                   labelText: 'E-Mail',
                   ),
-                autovalidateMode: AutovalidateMode.onUnfocus,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (String? email) { return validation.validateEmail(email); },
               ),
             ),
@@ -123,7 +125,7 @@ class _AppSignUp extends State<SignUp> {
                   border: OutlineInputBorder(), 
                   labelText: 'Contraseña',
                   ),
-                autovalidateMode: AutovalidateMode.onUnfocus,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (String? password) { return validation.validatePassword(password); },
               ),
             ),
@@ -145,7 +147,7 @@ class _AppSignUp extends State<SignUp> {
                   border: OutlineInputBorder(), 
                   labelText: 'Confirmar contraseña',
                   ),
-                autovalidateMode: AutovalidateMode.onUnfocus,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (String? confirmedPassword) { 
                   if (_inputPassword.isEmpty){
                     return 'Primero ingrese una contraseña válida.';
@@ -157,7 +159,10 @@ class _AppSignUp extends State<SignUp> {
 
             SizedBox(height: 20.0),
             //TODO: This button should trigger the database resgistration.
-            FilledButton(onPressed: (){}, child: Text('Registrarse')),
+            FilledButton(onPressed: (){
+              
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }, child: Text('Registrarse')),
           ]
         ),
       )
