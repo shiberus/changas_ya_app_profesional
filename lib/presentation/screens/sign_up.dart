@@ -32,12 +32,14 @@ class _AppSignUp extends State<SignUp> {
   void _submitRegister(){
     
     String snackBarMessage = '';
+    User newUser = User(_inputName, _inputEmail, _inputPassword);
     
 
     if (!_formkey.currentState!.validate()){ 
       snackBarMessage = 'No se pudo registrar el usuario'; 
     } else {
-      snackBarMessage = '¡Usuario registrado!';
+      String userName = newUser.getName();
+      snackBarMessage = "¡$userName, fuiste registrado con éxito!";
     }
     SnackBar snackBar = SnackBar(content: Text(snackBarMessage));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -184,7 +186,6 @@ class _AppSignUp extends State<SignUp> {
 
 class _RegisterTitleWidget extends StatelessWidget {
   const _RegisterTitleWidget({
-    super.key,
     required this.titleStyle,
   });
 
