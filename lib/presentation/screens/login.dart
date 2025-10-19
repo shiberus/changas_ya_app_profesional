@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:changas_ya_app/Domain/User/user.dart';
 import 'package:changas_ya_app/core/Services/validate_users.dart';
 import 'package:changas_ya_app/core/Services/field_validation.dart';
+import 'package:changas_ya_app/presentation/components/app_bar.dart';
 
 class AppLogin extends StatefulWidget {
   static const String name = 'login';
@@ -13,17 +14,16 @@ class AppLogin extends StatefulWidget {
 }
 
 class _AppLoginState extends State<AppLogin> {
-
   // Agregar instancia de objeto usuario.
-  
+
   late TextEditingController emailController = TextEditingController();
   late TextEditingController passwordController = TextEditingController();
   String _inputEmail = '';
   String _inputPassword = '';
 
   FieldValidation validation = FieldValidation();
-  
-  bool validateData (User userData) {
+
+  bool validateData(User userData) {
     ValidateUsers authenticate = ValidateUsers();
     return authenticate.dummyValidation(userData);
     //return authenticate.validateUser(userData);
@@ -33,35 +33,37 @@ class _AppLoginState extends State<AppLogin> {
   //   final showMessage = SnackbarStateless(message: messageValue,).build(context);
   //   ScaffoldMessenger.of(context).showSnackBar(showMessage);
   // }
-  
+
   @override
   Widget build(BuildContext context) {
-
     final textStyle = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Changas Ya'),
-        backgroundColor: Colors.blue,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: CustomAppBar(),
       ),
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-        
             Container(
               margin: const EdgeInsets.only(bottom: 5.0),
               width: double.infinity,
               height: 200,
               child: Image.asset(
                 'lib/images/login_banner.png',
-                fit: BoxFit.cover),
+                fit: BoxFit.cover,
+              ),
             ),
 
             Container(
               margin: EdgeInsets.only(top: 5.0, bottom: 10.0),
-              child: Text('> Ingrese a la aplicación <', style: textStyle.titleLarge,)
+              child: Text(
+                '> Ingrese a la aplicación <',
+                style: textStyle.titleLarge,
+              ),
             ),
 
             Container(
@@ -69,84 +71,102 @@ class _AppLoginState extends State<AppLogin> {
               child: TextFormField(
                 controller: emailController,
                 onChanged: (String nameValue) {
-                  if (emailController.text.isNotEmpty){
+                  if (emailController.text.isNotEmpty) {
                     setState(() {
                       _inputEmail = emailController.text;
                     });
-                  }                
+                  }
                 },
                 obscureText: false,
-                decoration: InputDecoration(border: OutlineInputBorder(), 
-                                            labelText: 'E-Mail'),
-                autovalidateMode: AutovalidateMode.onUnfocus,
-                validator: (String? text) { return validation.validateEmail(text); }
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'E-Mail',
+                ),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (String? text) {
+                  return validation.validateEmail(text);
+                },
               ),
             ),
-        
-            SizedBox(height: 20,),
-        
+
+            SizedBox(height: 20),
+
             Container(
               margin: EdgeInsets.symmetric(horizontal: 10.0),
               child: TextFormField(
                 controller: passwordController,
                 onChanged: (String passwordValue) {
-                  if (passwordController.text.isNotEmpty){
+                  if (passwordController.text.isNotEmpty) {
                     setState(() {
                       _inputPassword = passwordController.text;
                     });
-                  }                
+                  }
                 },
                 obscureText: true,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(), 
+                  border: OutlineInputBorder(),
                   labelText: 'Contraseña',
-                  ),
-                autovalidateMode: AutovalidateMode.onUnfocus,
-                validator: (String? password) { return validation.validatePassword(password); },
+                ),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (String? password) {
+                  return validation.validatePassword(password);
+                },
               ),
             ),
-            
-            SizedBox(height: 20.0,),
-        
+
+            TextButton(
+              onPressed: () {
+                context.push('/changePassword');
+              },
+              child: Text("Cambiar contraseña", style: textStyle.labelMedium),
+            ),
+
+            SizedBox(height: 20.0),
+
             Row(
-              mainAxisAlignment:  MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                FilledButton(onPressed: () {
-                  User newUser = User('', _inputEmail, _inputPassword);
-                  if (validateData(newUser)){
-                    
-                    context.push('/jobs', extra: {newUser.getName()});
-                  }     
-                }, 
-                child: Text('Iniciar sesión'),
-              ),
-                
-                SizedBox(width: 10.0,),
+                FilledButton(
+                  onPressed: () {
+                    User newUser = User('', _inputEmail, _inputPassword);
+                    if (validateData(newUser)) {
+                      context.push('/jobs', extra: {newUser.getName()});
+                    }
+                  },
+                  child: Text('Iniciar sesión'),
+                ),
+
+                SizedBox(width: 10.0),
                 Text("ó"),
-                SizedBox(width: 10.0,),
-                
-                FilledButton.tonal(onPressed: () {
-                  context.push('/signup');
-                }, child: Text('Registarse')),
+                SizedBox(width: 10.0),
+
+                FilledButton.tonal(
+                  onPressed: () {
+                    context.push('/signup');
+                  },
+                  child: Text('Registarse'),
+                ),
               ],
             ),
 
-            SizedBox(height: 30.0,),
+            SizedBox(height: 30.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Instituto Tecnológico ORT  2025',
-                  style: TextStyle(fontSize: 12.0,),          
-                  ),
-                  //TextButton(onPressed: () => { context.push(/nosotros)}, child: Text("Nosotros")),
-                  TextButton(onPressed: (){}, child: Text("Nosotros", style: TextStyle(fontSize: 12.0),))
-              ]
-            )
+                  style: TextStyle(fontSize: 12.0),
+                ),
+                //TextButton(onPressed: () => { context.push(/nosotros)}, child: Text("Nosotros")),
+                TextButton(
+                  onPressed: () {},
+                  child: Text("Nosotros", style: TextStyle(fontSize: 12.0)),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
-    
   }
 }
