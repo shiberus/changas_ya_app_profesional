@@ -30,6 +30,8 @@ class _AppChangePassword extends State<ChangePassword> {
   // Key to indentify the form.
   final _changePasswordFormkey = GlobalKey<FormState>();
 
+  
+
   @override
   Widget build(BuildContext context) {
     // Insets for text field alignment
@@ -155,7 +157,7 @@ class _AppChangePassword extends State<ChangePassword> {
                       obscureText: true,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'Confirmar contraseña',
+                        labelText: 'Confirmar nueva contraseña',
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (String? confirmedNewPassword) {

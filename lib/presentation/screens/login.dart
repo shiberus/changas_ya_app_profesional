@@ -118,7 +118,7 @@ class _AppLoginState extends State<AppLogin> {
               onPressed: () {
                 context.push('/changePassword');
               },
-              child: Text("Cambiar contraseña", style: textStyle.labelMedium),
+              child: Text("¿Cambiar contraseña?", style: textStyle.labelMedium),
             ),
 
             SizedBox(height: 20.0),
@@ -126,25 +126,31 @@ class _AppLoginState extends State<AppLogin> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                FilledButton(
+                ElevatedButton(
                   onPressed: () {
                     User newUser = User('', _inputEmail, _inputPassword);
                     if (validateData(newUser)) {
                       context.push('/jobs', extra: {newUser.getName()});
                     }
                   },
-                  child: Text('Iniciar sesión'),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[400]
+                  ),
+                  child: Text('Iniciar sesión', style: TextStyle(color: Colors.white)),
                 ),
 
                 SizedBox(width: 10.0),
                 Text("ó"),
                 SizedBox(width: 10.0),
 
-                FilledButton.tonal(
+                ElevatedButton(
                   onPressed: () {
                     context.push('/signup');
                   },
-                  child: Text('Registarse'),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[100]
+                  ),
+                  child: Text('Registarse', style: TextStyle(color: Colors.grey[800])),
                 ),
               ],
             ),
@@ -154,13 +160,13 @@ class _AppLoginState extends State<AppLogin> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Instituto Tecnológico ORT  2025',
-                  style: TextStyle(fontSize: 12.0),
+                  'Instituto Tecnológico ORT - 2025',
+                  style: textStyle.labelMedium,
                 ),
-                //TextButton(onPressed: () => { context.push(/nosotros)}, child: Text("Nosotros")),
+                //TextButton(onPressed: () => { context.push(/nosotros)}, child: Text("Nosotros", style: textStyle.labelMedium)),
                 TextButton(
                   onPressed: () {},
-                  child: Text("Nosotros", style: TextStyle(fontSize: 12.0)),
+                  child: Text("Nosotros", style: textStyle.labelMedium,)
                 ),
               ],
             ),
