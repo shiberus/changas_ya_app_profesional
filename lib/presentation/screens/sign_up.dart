@@ -31,16 +31,22 @@ class _AppSignUp extends State<SignUp> {
   // Use the form data, validate it and submmit it to the data base.
   void _submitRegister() {
     String snackBarMessage = '';
+    Color? _snackBarColor = Colors.black;
     User newUser = User(_inputName, _inputEmail, _inputPassword);
 
     if (_formkey.currentState!.validate()) {
       // Agregar la lógica de registro para un nuevo usuario.
       String userName = newUser.getName();
       snackBarMessage = "¡$userName, fuiste registrado con éxito!";
+      _snackBarColor = Colors.green[400];
     } else {
       snackBarMessage = 'No se pudo registrar el usuario';
+      _snackBarColor = Colors.red[400];
     }
-    SnackBar snackBar = SnackBar(content: Text(snackBarMessage));
+    SnackBar snackBar = SnackBar(
+      content: Text(snackBarMessage),
+      backgroundColor: _snackBarColor,
+      );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 

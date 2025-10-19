@@ -29,11 +29,6 @@ class _AppLoginState extends State<AppLogin> {
     //return authenticate.validateUser(userData);
   }
 
-  // void showSnackBar(String messageValue){
-  //   final showMessage = SnackbarStateless(message: messageValue,).build(context);
-  //   ScaffoldMessenger.of(context).showSnackBar(showMessage);
-  // }
-
   @override
   Widget build(BuildContext context) {
     final textStyle = Theme.of(context).textTheme;
@@ -121,7 +116,7 @@ class _AppLoginState extends State<AppLogin> {
               child: Text("¿Cambiar contraseña?", style: textStyle.labelMedium),
             ),
 
-            SizedBox(height: 20.0),
+            SizedBox(height: 10.0),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -155,7 +150,7 @@ class _AppLoginState extends State<AppLogin> {
               ],
             ),
 
-            SizedBox(height: 30.0),
+            SizedBox(height: 20.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

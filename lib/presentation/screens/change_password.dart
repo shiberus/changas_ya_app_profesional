@@ -30,7 +30,23 @@ class _AppChangePassword extends State<ChangePassword> {
   // Key to indentify the form.
   final _changePasswordFormkey = GlobalKey<FormState>();
 
-  
+  void validateChange(){
+    String _snackBarMessage = '';
+    Color? _snackBarColor = Colors.black;
+    if (_changePasswordFormkey.currentState!.validate()){
+      _snackBarMessage = '¡Se cambió la contraseña!';
+      _snackBarColor = Colors.green[400];
+    } else {
+      _snackBarMessage = 'Ocurrió un problema...';
+      _snackBarColor = Colors.red[400];
+    }
+
+    final SnackBar snackBar = SnackBar(
+      content: Text(_snackBarMessage), 
+      backgroundColor: _snackBarColor, 
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
