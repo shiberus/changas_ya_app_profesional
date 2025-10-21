@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "563535673587",
+    "project_id": "changas-ya-cd978",
+    "storage_bucket": "changas-ya-cd978.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:563535673587:android:e08e9789da505b66a51f86",
+        "android_client_info": {
+          "package_name": "com.example.changas_ya_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvblEUjbrJRatYxEgVMWIFc9Oup0AyQGo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

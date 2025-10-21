@@ -36,6 +36,8 @@ class Job {
     this.paymentMethod,
   });
 
+  
+
   double get budgetTotal {
     final manpower = budgetManpower ?? 0.0;
     final spares = budgetSpares ?? 0.0;
