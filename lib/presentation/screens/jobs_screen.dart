@@ -29,7 +29,6 @@ class _JobScreenState extends ConsumerState<JobsScreen> {
         title: const Text('Trabajos'),
         centerTitle: true,
       ),
-      // 💡 Muestra un indicador de carga mientras los datos están vacíos
       body: jobs.isEmpty
           ? const Center(child: CircularProgressIndicator()) 
           : _JobsView(jobs: jobs),
