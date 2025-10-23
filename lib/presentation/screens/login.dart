@@ -125,7 +125,7 @@ class _AppLoginState extends State<AppLogin> {
                   onPressed: () {
                     User newUser = User('', _inputEmail, _inputPassword);
                     if (validateData(newUser)) {
-                      context.push('/jobs', extra: {newUser.getName()});
+                      context.go('/', extra: {newUser.getName()});
                     }
                   },
                   style: ElevatedButton.styleFrom(
