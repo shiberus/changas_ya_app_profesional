@@ -31,19 +31,19 @@ class _AppChangePassword extends State<ChangePassword> {
   final _changePasswordFormkey = GlobalKey<FormState>();
 
   void validateChange(){
-    String _snackBarMessage = '';
-    Color? _snackBarColor = Colors.black;
+    String snackBarMessage = '';
+    Color? snackBarColor = Colors.black;
     if (_changePasswordFormkey.currentState!.validate()){
-      _snackBarMessage = '¡Se cambió la contraseña!';
-      _snackBarColor = Colors.green[400];
+      snackBarMessage = '¡Se cambió la contraseña!';
+      snackBarColor = Colors.green[400];
     } else {
-      _snackBarMessage = 'Ocurrió un problema...';
-      _snackBarColor = Colors.red[400];
+      snackBarMessage = 'Ocurrió un problema...';
+      snackBarColor = Colors.red[400];
     }
 
     final SnackBar snackBar = SnackBar(
-      content: Text(_snackBarMessage), 
-      backgroundColor: _snackBarColor, 
+      content: Text(snackBarMessage), 
+      backgroundColor: snackBarColor, 
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
