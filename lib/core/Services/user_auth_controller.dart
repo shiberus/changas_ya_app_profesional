@@ -39,8 +39,6 @@ class UserAuthController {
         email: email,
         password: password
         );
-
-        //TODO: Add the user state to riverpod.
     } on FirebaseAuthException catch(e) {
         String exceptionMessage = '';
 
@@ -72,7 +70,7 @@ class UserAuthController {
     if (!_isUserAuthenticated()){
       try {
         await userLogIn(email, oldPassword);
-      } catch (w){
+      } catch (e){
         throw Exception('Ocurrió un error durante la autenticación.');
       }
     }

@@ -36,32 +36,28 @@ class _AppSignUp extends State<SignUp> {
     Color? snackBarColor = Colors.red[400];
 
     if (_formkey.currentState!.validate()) {
-      
       User newUser = User(_inputName, _inputEmail, _inputPassword);
       try {
-        
         await _auth.registerUser(newUser.getEmail(), newUser.getPassword());
 
         snackBarMessage = '¡Usuario registraso con exito!';
         snackBarColor = Colors.green[400];
-
       } on Exception catch (e) {
         snackBarMessage = e.toString();
       }
-      
     } else {
       snackBarMessage = 'Verifique los valores ingresados en el formulario.';
     }
-    
-    snackBarPopUp(snackBarMessage, snackBarColor);
+
+    _snackBarPopUp(snackBarMessage, snackBarColor);
   }
 
-  void snackBarPopUp (String message, Color? background){
-  SnackBar snackBar = SnackBar(
-        content: Text(message),
-        backgroundColor: background,
-        );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  void _snackBarPopUp(String message, Color? background) {
+    SnackBar snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: background,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override

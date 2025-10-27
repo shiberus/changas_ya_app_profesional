@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:changas_ya_app/presentation/components/banner_widget.dart';
 import 'package:changas_ya_app/core/Services/field_validation.dart';
 import 'package:changas_ya_app/presentation/components/app_bar.dart';
+import 'package:changas_ya_app/core/Services/user_auth_controller.dart';
 
 class ChangePassword extends StatefulWidget {
   static const String screenName = 'changePassword';
@@ -30,20 +31,37 @@ class _AppChangePassword extends State<ChangePassword> {
   // Key to indentify the form.
   final _changePasswordFormkey = GlobalKey<FormState>();
 
-  void validateChange(){
+  // Instance for authentication.
+  final UserAuthController _auth = UserAuthController();
+
+  // Validate the password change.
+  Future<void> validateChange() async {
     String snackBarMessage = '';
-    Color? snackBarColor = Colors.black;
-    if (_changePasswordFormkey.currentState!.validate()){
-      snackBarMessage = '¡Se cambió la contraseña!';
-      snackBarColor = Colors.green[400];
+    Color? snackBarColor = Colors.red[400];
+
+    if (_changePasswordFormkey.currentState!.validate()) {
+      try {
+        await _auth.changeUserPassword(
+          _inputEmail,
+          _inputOldPassword,
+          _inputNewPassword,
+        );
+        snackBarMessage = '¡Se cambió la contraseña!';
+        snackBarColor = Colors.green[400];
+      } on Exception catch (e) {
+        snackBarMessage = e.toString();
+      }
     } else {
       snackBarMessage = 'Ocurrió un problema...';
-      snackBarColor = Colors.red[400];
     }
 
-    final SnackBar snackBar = SnackBar(
-      content: Text(snackBarMessage), 
-      backgroundColor: snackBarColor, 
+    snackBarPopUp(snackBarMessage, snackBarColor);
+  }
+
+  void snackBarPopUp(String message, Color? background) {
+    SnackBar snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: background,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
