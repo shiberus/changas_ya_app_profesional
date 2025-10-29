@@ -3,6 +3,7 @@ import 'package:changas_ya_app/presentation/screens/jobs_screen.dart';
 import 'package:changas_ya_app/presentation/screens/login.dart';
 import 'package:changas_ya_app/presentation/screens/sign_up.dart';
 import 'package:changas_ya_app/presentation/screens/change_password.dart';
+import 'package:changas_ya_app/presentation/screens/profile_screen.dart'; 
 import 'package:go_router/go_router.dart';
 
 final appRouter = GoRouter(
@@ -11,31 +12,34 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/login',
       name: AppLogin.name,
-      builder:(context, state) => const AppLogin(),
-      ),
+      builder: (context, state) => const AppLogin(),
+    ),
     GoRoute(
       path: '/signup',
       name: SignUp.name,
-      builder:(context, state) => const SignUp(),
-     ),
-     GoRoute(
+      builder: (context, state) => const SignUp(),
+    ),
+    GoRoute(
       path: '/changePassword',
       name: ChangePassword.screenName,
-      builder:(context, state) => const ChangePassword(),
-     ),
-     GoRoute(
+      builder: (context, state) => const ChangePassword(),
+    ),
+    GoRoute(
       path: '/',
-      name: 'home', 
+      name: 'home',
       builder: (context, state) => const HomeScreen(),
       routes: [
         GoRoute(
-          path: '/jobs',
+          path: 'jobs', 
           name: JobsScreen.name,
-          builder: (context, state) {
-            return JobsScreen();
-          },
+          builder: (context, state) => const JobsScreen(),
+        ),
+        GoRoute(
+          path: 'perfil', 
+          name: ProfileScreen.screenName,
+          builder: (context, state) => const ProfileScreen(),
         ),
       ],
     ),
-  ]
+  ],
 );
