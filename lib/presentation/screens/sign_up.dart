@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:changas_ya_app/core/Services/field_validation.dart';
 import 'package:changas_ya_app/presentation/components/banner_widget.dart';
 import 'package:changas_ya_app/presentation/components/app_bar.dart';
+import 'package:changas_ya_app/core/Services/user_auth_controller.dart';
 
 class SignUp extends StatefulWidget {
   static const String name = 'signup';
@@ -27,26 +28,35 @@ class _AppSignUp extends State<SignUp> {
 
   // Key to identify the form.
   final _formkey = GlobalKey<FormState>();
+  final UserAuthController _auth = UserAuthController();
 
   // Use the form data, validate it and submmit it to the data base.
-  void _submitRegister() {
+  Future<void> _submitRegister() async {
     String snackBarMessage = '';
-    Color? _snackBarColor = Colors.black;
-    User newUser = User(_inputName, _inputEmail, _inputPassword);
+    Color? snackBarColor = Colors.red[400];
 
     if (_formkey.currentState!.validate()) {
-      // Agregar la lógica de registro para un nuevo usuario.
-      String userName = newUser.getName();
-      snackBarMessage = "¡$userName, fuiste registrado con éxito!";
-      _snackBarColor = Colors.green[400];
+      User newUser = User(_inputName, _inputEmail, _inputPassword);
+      try {
+        await _auth.registerUser(newUser.getEmail(), newUser.getPassword());
+
+        snackBarMessage = '¡Usuario registraso con exito!';
+        snackBarColor = Colors.green[400];
+      } on Exception catch (e) {
+        snackBarMessage = e.toString();
+      }
     } else {
-      snackBarMessage = 'No se pudo registrar el usuario';
-      _snackBarColor = Colors.red[400];
+      snackBarMessage = 'Verifique los valores ingresados en el formulario.';
     }
+
+    _snackBarPopUp(snackBarMessage, snackBarColor);
+  }
+
+  void _snackBarPopUp(String message, Color? background) {
     SnackBar snackBar = SnackBar(
-      content: Text(snackBarMessage),
-      backgroundColor: _snackBarColor,
-      );
+      content: Text(message),
+      backgroundColor: background,
+    );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -188,8 +198,8 @@ class _AppSignUp extends State<SignUp> {
                   SizedBox(height: 20.0),
 
                   ElevatedButton(
-                    onPressed: () {
-                      _submitRegister();
+                    onPressed: () async {
+                      await _submitRegister();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue[400],
@@ -208,40 +218,3 @@ class _AppSignUp extends State<SignUp> {
     );
   }
 }
-
-// ELiminar si el banner en el otro módulo funciona.
-// class _RegisterTitleWidget extends StatelessWidget {
-//   const _RegisterTitleWidget({
-//     required this.titleStyle,
-//   });
-
-//   final TextStyle titleStyle;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       margin: EdgeInsets.all(20.0),
-//       width: double.infinity,
-//       height: 150,
-//       decoration: BoxDecoration(
-//         color: Color.fromARGB(255, 43, 171, 245),
-//         borderRadius: BorderRadius.all(Radius.circular(15.0))
-//       ),
-//       child: Column(
-//         children: [
-//           Column(
-    
-//             children: [
-//             Image.asset('lib/images/signup_banner.png',fit: BoxFit.contain, scale: 5.0,),
-//           ]),
-    
-//           Column(
-//             children: [
-//               Center(child: Text('Registro de usuario', style: titleStyle)),
-//             ],
-//           )
-//         ],
-//       ),
-//     );
-//   }
-// }

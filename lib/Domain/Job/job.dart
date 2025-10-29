@@ -69,7 +69,7 @@ factory Job.fromFirestore(
     final data = snapshot.data();
     
     // Función helper para convertir Timestamp a DateTime de forma segura
-    DateTime? _getDateTime(dynamic field) {
+    DateTime? getDateTime(dynamic field) {
       if (field == null) return null;
       if (field is Timestamp) {
         return field.toDate();
@@ -84,7 +84,7 @@ factory Job.fromFirestore(
       status: data?['status'] ?? 'Desconocido',
       
       // Conversión de Timestamp a DateTime. Usamos una aserción '!' porque 'datePosted' es requerido.
-      datePosted: _getDateTime(data?['datePosted'])!, 
+      datePosted: getDateTime(data?['datePosted'])!, 
       
       // Conversión segura de la lista
       imageUrls: List<String>.from(data?['imageUrls'] ?? []),
@@ -98,8 +98,8 @@ factory Job.fromFirestore(
       
       // Campos opcionales
       workerId: data?['workerId'],
-      dateStart: _getDateTime(data?['dateStart']),
-      dateEnd: _getDateTime(data?['dateEnd']),
+      dateStart: getDateTime(data?['dateStart']),
+      dateEnd: getDateTime(data?['dateEnd']),
       paymentMethod: data?['paymentMethod'],
     );
   }
