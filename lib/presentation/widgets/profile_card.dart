@@ -9,8 +9,6 @@ class ProfileCard extends ConsumerWidget {
 
   const ProfileCard({super.key, required this.profileId});
 
-  
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(professionalFutureProvider(profileId));
@@ -34,9 +32,6 @@ class ProfileCard extends ConsumerWidget {
         ),
       ),
       data: (profile) {
-        // Estado de datos: profile es de tipo profile?
-
-        // Manejar el caso donde no se encuentra el usuario
         if (profile == null) {
           return const Card(
             child: Padding(
@@ -49,16 +44,10 @@ class ProfileCard extends ConsumerWidget {
           );
         }
 
-        // ⭐️ Lógica de datos (SAFE: profile ahora es de tipo profile) ⭐️
-
         final tradesToShow = profile.trades.take(_maxTradesVisible);
         final hasMoreTrades = (profile.trades.length) > _maxTradesVisible;
 
-        // NOTA: Asumo que tu clase profile tiene los campos booleanos (isProfessional)
-        // y numéricos (rating, completedJobs) necesarios.
-        // He añadido un valor por defecto para 'completedJobs' si no existe en la clase profile.
-        final completedJobs =
-            35; // Aquí deberías usar profile.completedJobs si existe
+        final completedJobs = 35; 
 
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
@@ -101,13 +90,11 @@ class ProfileCard extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          // NOTA: Asumo profile.isProfessional y profile.rating.
-                          // Si no existen, usa valores seguros o implementa la lógica.
-                          if (profile.isProfessional ?? false)
+                          if (profile.isProfessional)
                             Chip(
                               label: Text(
                                 // Usa el rating o un valor por defecto si es null
-                                'Cal. ${(profile.rating ?? 0.0).toStringAsFixed(1)}',
+                                'Cal. ${(profile.rating).toStringAsFixed(1)}',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.white,
@@ -121,7 +108,7 @@ class ProfileCard extends ConsumerWidget {
                         ],
                       ),
                       // Mostramos en caso de que sea profesional y tenga trabajos completados
-                      if (profile.isProfessional ?? false)
+                      if (profile.isProfessional)
                         Padding(
                           padding: const EdgeInsets.only(top: 2.0, bottom: 2.0),
                           child: Text(

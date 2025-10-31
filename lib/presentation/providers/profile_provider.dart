@@ -12,6 +12,5 @@ final userRepositoryProvider = Provider<ProfileRepository>((ref) {
 
 final professionalFutureProvider = FutureProvider.family<Profile?, String>((ref, userId) async {
   final repository = ref.watch(userRepositoryProvider);
-  
   return repository.fetchProfileById(userId);
 });
