@@ -26,6 +26,6 @@ User getMockUser() {
   user.setOpiniones([
     Opinion('Excelente servicio', 5),
     Opinion('Muy cumplidor', 4),
-  ]);
-  return user;
+  ]);                                        
+  return user;                     
 }

@@ -1,78 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:changas_ya_app/Domain/User/user.dart';
-import 'package:changas_ya_app/core/Services/validate_users.dart';
+//import 'package:changas_ya_app/core/Services/validate_users.dart';
 import 'package:changas_ya_app/core/Services/field_validation.dart';
 import 'package:changas_ya_app/presentation/components/app_bar.dart';
 import 'package:changas_ya_app/core/Services/user_auth_controller.dart';
+import 'package:changas_ya_app/Domain/Auth_exception/auth_exception.dart';
 
-class AppLogin extends StatefulWidget {
+class AppLogin extends ConsumerWidget {
   static const String name = 'login';
   const AppLogin({super.key});
 
   @override
-  State<AppLogin> createState() => _AppLoginState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    late TextEditingController emailController = TextEditingController();
+    late TextEditingController passwordController = TextEditingController();
+    String inputEmail = '';
+    String inputPassword = '';
+    final textStyle = Theme.of(context).textTheme;
 
-class _AppLoginState extends State<AppLogin> {
-  // Agregar instancia de objeto usuario.
+    FieldValidation validation = FieldValidation();
+    final UserAuthController auth = UserAuthController();
 
-  late TextEditingController emailController = TextEditingController();
-  late TextEditingController passwordController = TextEditingController();
-  String _inputEmail = '';
-  String _inputPassword = '';
+    final logInFormkey = GlobalKey<FormState>();
 
-  FieldValidation validation = FieldValidation();
-  final UserAuthController _auth = UserAuthController();
+    void snackBarPopUp(String message, Color? background) {
+      SnackBar snackBar = SnackBar(
+        content: Text(message),
+        backgroundColor: background,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
 
-  final _logInFormkey = GlobalKey<FormState>();
-
-  //Validate the usser credentials using the auth controller.
-  Future<bool> _validateUserCredentials(User user) async {
-
+    //Validate the usser credentials using the auth controller.
+    Future<bool> validateUserCredentials(User user) async {
       bool isAuthenticated = false;
       String snackBarMessage = '';
-      Color? snackBarColor = Colors.black;
+      Color? snackBarColor = Colors.red[400];
 
-      if (_logInFormkey.currentState!.validate()){
-        try{
-          
-          await _auth.userLogIn(user.getEmail(), user.getPassword());
-          
+      if (logInFormkey.currentState!.validate()) {
+        try {
+          await auth.userLogIn(user.getEmail(), user.getPassword());
+
           isAuthenticated = true;
           snackBarMessage = '¡Sesión inciada! ';
           snackBarColor = Colors.green[400];
-        } on Exception catch (e){
-          snackBarMessage = e.toString();
-          snackBarColor = Colors.red[400];
+        } on AuthException catch (e) {
+          snackBarMessage = e.showErrorMessage();
         }
       } else {
-        snackBarMessage = 'Ocurrió un problema...';
-        snackBarColor = Colors.red[400];
+        snackBarMessage = 'Ocurrió un problema, verifique los campos.';
       }
 
       snackBarPopUp(snackBarMessage, snackBarColor);
       return isAuthenticated;
-  }
-
-  void snackBarPopUp (String message, Color? background){
-    SnackBar snackBar = SnackBar(
-          content: Text(message),
-          backgroundColor: background,
-          );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  // Test validation
-  bool validateData(User userData) {
-    ValidateUsers authenticate = ValidateUsers();
-    return authenticate.dummyValidation(userData);
-    //return authenticate.validateUser(userData);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme;
+    }
 
     return Scaffold(
       appBar: PreferredSize(
@@ -82,7 +65,7 @@ class _AppLoginState extends State<AppLogin> {
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: Form(
-          key: _logInFormkey,
+          key: logInFormkey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -110,9 +93,7 @@ class _AppLoginState extends State<AppLogin> {
                   controller: emailController,
                   onChanged: (String nameValue) {
                     if (emailController.text.isNotEmpty) {
-                      setState(() {
-                        _inputEmail = emailController.text;
-                      });
+                        inputEmail = emailController.text;
                     }
                   },
                   obscureText: false,
@@ -135,9 +116,7 @@ class _AppLoginState extends State<AppLogin> {
                   controller: passwordController,
                   onChanged: (String passwordValue) {
                     if (passwordController.text.isNotEmpty) {
-                      setState(() {
-                        _inputPassword = passwordController.text;
-                      });
+                        inputPassword = passwordController.text;
                     }
                   },
                   obscureText: true,
@@ -163,14 +142,19 @@ class _AppLoginState extends State<AppLogin> {
               ),
 
               SizedBox(height: 10.0),
-
+ 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    onPressed: ()async {
-                      User userToAuthenticate = User('', _inputEmail, _inputPassword);
-                      if (await _validateUserCredentials(userToAuthenticate) && context.mounted){
+                    onPressed: () async {
+                      User userToAuthenticate = User(
+                        '',
+                        inputEmail,
+                        inputPassword,
+                      );
+                      if (await validateUserCredentials(userToAuthenticate) &&
+                          context.mounted) {
                         context.push('/');
                       }
                     },
