@@ -1,9 +1,14 @@
 import 'package:changas_ya_app/Domain/Auth_exception/auth_exception.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+// Cambiar por Profile.dart en cuanto se reciban los cambios.
+// Se ustiliza un alias para evitar conflictos.
+import 'package:changas_ya_app/Domain/User/user.dart' as app_user;
 //import 'package:changas_ya_app/Domain/User/user.dart';
 
 class UserAuthController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   /// Función asíncrona para el registro de usuario en Firebase.
   ///
@@ -11,14 +16,21 @@ class UserAuthController {
   /// [password] Contraseña ingresada por el usuario.
   ///
   /// @returns: (bool, String)
-  Future<void> registerUser(String email, String password) async {
+  //Firma original del método.
+  //Future<void> registerUser(String email, String password) async {
+  Future<void> registerUser(app_user.User newUser) async {
     String errorCode = '';
     String errorMessage = '';
     try {
       await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
+        email: newUser.getEmail(),
+        password: newUser.getPassword(),
       );
+
+      // TODO: Cambiar método por el que se va a utilizar en el repository de Firebase.
+      // También se puede crear un perfil en Firestore/RealtimeDB desde aquí
+      // usando los datos de `newUser`.
+      await registerUserProfile(newUser);
     } on FirebaseAuthException catch (e) {
       errorCode = e.code;
       switch (e.code) {
@@ -36,7 +48,6 @@ class UserAuthController {
               'Operación no permitida. Utilice otro método de Inicio de sesión.';
           break;
       }
-
       throw AuthException(errorCode: errorCode, errorMessage: errorMessage);
     } catch (e) {
       errorCode = 'Desconocido';
@@ -98,7 +109,10 @@ class UserAuthController {
       try {
         await userLogIn(email, oldPassword);
       } on AuthException catch (e) {
-        throw AuthException(errorCode: e.getErrorCode(), errorMessage: e.showErrorMessage());
+        throw AuthException(
+          errorCode: e.getErrorCode(),
+          errorMessage: e.showErrorMessage(),
+        );
       }
     }
 
@@ -107,13 +121,15 @@ class UserAuthController {
     try {
       await _changePassword(user, newPassword);
     } on AuthException catch (e) {
-      throw AuthException(errorCode: e.getErrorCode(), errorMessage: e.showErrorMessage());
+      throw AuthException(
+        errorCode: e.getErrorCode(),
+        errorMessage: e.showErrorMessage(),
+      );
     }
   }
 
   bool _isUserAuthenticated() {
-    bool a = _auth.currentUser != null; 
-    return a;
+    return _auth.currentUser != null;
   }
 
   Future<void> _changePassword(User? user, String newPassword) async {
@@ -142,5 +158,28 @@ class UserAuthController {
 
   String? getuserUid() {
     if (_isUserAuthenticated()) return _auth.currentUser?.uid;
+    return null;
+  }
+
+
+  // Esta fucnión está acá por motivos de prueba para el flujo de registro.
+  Future<void> registerUserProfile(app_user.User data) async {
+    final String dbCollection = "usuarios";
+    final String userId = getuserUid() ?? _db.collection(dbCollection).doc().id;
+    final userData = <String, String>{
+      "email": data.getEmail(),
+      "name": data.getName(),
+    };
+
+    await _db
+        .collection(dbCollection)
+        .doc(userId)
+        .set(userData)
+        .onError(
+          (e, _) => throw AuthException(
+            errorCode: "error de carga",
+            errorMessage: e.toString(),
+          ),
+        );
   }
 }

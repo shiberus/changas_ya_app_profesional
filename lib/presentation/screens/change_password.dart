@@ -23,7 +23,6 @@ class ChangePassword extends ConsumerWidget {
   String inputEmail = '';
   String inputOldPassword = '';
   String inputNewPassword = '';
-  String inputConfirmedNewPassword = '';
 
   // Intance for validation class.
   FieldValidation validation = FieldValidation();
@@ -175,12 +174,6 @@ class ChangePassword extends ConsumerWidget {
                     margin: textFieldsInset,
                     child: TextFormField(
                       controller: confirmedNewPasswordController,
-                      onChanged: (String confirmedPasswordValue) {
-                        if (confirmedNewPasswordController.text.isNotEmpty) {
-                            inputConfirmedNewPassword =
-                                confirmedNewPasswordController.text;
-                        }
-                      },
                       obscureText: true,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),

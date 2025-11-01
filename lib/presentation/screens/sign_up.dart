@@ -47,7 +47,7 @@ class SignUp extends ConsumerWidget {
       if (formkey.currentState!.validate()) {
         User newUser = User(inputName, inputEmail, inputPassword);
         try {
-          await auth.registerUser(newUser.getEmail(), newUser.getPassword());
+          await auth.registerUser(newUser);
 
           snackBarMessage = '¡Usuario registraso con exito!';
           snackBarColor = Colors.green[400];
