@@ -15,7 +15,7 @@ class ProfileCard extends ConsumerWidget {
 
     return profile.when(
       loading: () => const Card(
-        // Indicador de carga simple mientras se esperan los datos
+        // Indicador de carga mientras se esperan los datos, circulo de carga
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Center(child: CircularProgressIndicator()),
