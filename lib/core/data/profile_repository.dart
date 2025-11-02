@@ -22,4 +22,14 @@ class ProfileRepository {
       throw Exception('Fallo al obtener el usuario.'); 
     }
   }
+
+  Future<void> updateProfile(Profile profile) async {
+      final profilesCollection = _db.collection(_collectionName).withConverter<Profile>(
+        fromFirestore: (snapshot, _) => Profile.fromFirestore(snapshot.data()!, snapshot.id),
+        toFirestore: (Profile profile, _) => profile.toFirestore(),
+      );
+      
+      final profileRef = profilesCollection.doc(profile.uid);
+      await profileRef.set(profile, SetOptions(merge: true)); // El merge true es para que mergee los cambios y no reemplace
+  }
 }

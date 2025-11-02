@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final firebaseFirestoreProvider = Provider((ref) => FirebaseFirestore.instance);
 
-final userRepositoryProvider = Provider<ProfileRepository>((ref) {
+final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
   final db = ref.watch(firebaseFirestoreProvider);
   return ProfileRepository(db);
 });
 
-final professionalFutureProvider = FutureProvider.family<Profile?, String>((ref, userId) async {
-  final repository = ref.watch(userRepositoryProvider);
-  return repository.fetchProfileById(userId);
+final professionalFutureProvider = FutureProvider.family<Profile?, String>((ref, profileId) async {
+  final repository = ref.watch(profileRepositoryProvider);
+  return repository.fetchProfileById(profileId);
 });
