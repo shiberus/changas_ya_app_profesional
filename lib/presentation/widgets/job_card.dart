@@ -21,7 +21,7 @@ class JobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.push('/jobs/${job.id}'); 
+        context.push('/jobDetail', extra: job); 
       },
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),

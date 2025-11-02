@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:changas_ya_app/presentation/components/banner_widget.dart';
 import 'package:changas_ya_app/core/Services/field_validation.dart';
 import 'package:changas_ya_app/presentation/components/app_bar.dart';
+import 'package:changas_ya_app/core/Services/user_auth_controller.dart';
+import 'package:go_router/go_router.dart';
 
 class ChangePassword extends StatefulWidget {
   static const String screenName = 'changePassword';
@@ -30,20 +32,37 @@ class _AppChangePassword extends State<ChangePassword> {
   // Key to indentify the form.
   final _changePasswordFormkey = GlobalKey<FormState>();
 
-  void validateChange(){
-    String _snackBarMessage = '';
-    Color? _snackBarColor = Colors.black;
-    if (_changePasswordFormkey.currentState!.validate()){
-      _snackBarMessage = '¡Se cambió la contraseña!';
-      _snackBarColor = Colors.green[400];
+  // Instance for authentication.
+  final UserAuthController _auth = UserAuthController();
+
+  // Validate the password change.
+  Future<void> _validateChange() async {
+    String snackBarMessage = '';
+    Color? snackBarColor = Colors.red[400];
+
+    if (_changePasswordFormkey.currentState!.validate()) {
+      try {
+        await _auth.changeUserPassword(
+          _inputEmail,
+          _inputOldPassword,
+          _inputNewPassword,
+        );
+        snackBarMessage = '¡Se cambió la contraseña!';
+        snackBarColor = Colors.green[400];
+      } on Exception catch (e) {
+        snackBarMessage = e.toString();
+      }
     } else {
-      _snackBarMessage = 'Ocurrió un problema...';
-      _snackBarColor = Colors.red[400];
+      snackBarMessage = 'Ocurrió un problema...';
     }
 
-    final SnackBar snackBar = SnackBar(
-      content: Text(_snackBarMessage), 
-      backgroundColor: _snackBarColor, 
+    snackBarPopUp(snackBarMessage, snackBarColor);
+  }
+
+  void snackBarPopUp(String message, Color? background) {
+    SnackBar snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: background,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
@@ -191,7 +210,12 @@ class _AppChangePassword extends State<ChangePassword> {
                   SizedBox(height: 20.0),
 
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: ()  async {
+                      await _validateChange();
+                      if (context.mounted){
+                        context.push('/');
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue[400],
                     ),

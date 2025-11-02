@@ -11,7 +11,7 @@ class FieldValidation {
   }
 
   String? validateEmail(String? text){
-  if (text == null || !text.contains('@') || !text.contains('.com')) {
+  if (text == null || !text.contains(RegExp(r'[k{@}]')) || !text.contains(RegExp(r'\.[A-Za-z]{2,4}$'))) {
     return 'Email invalido';
   }
   return null;
@@ -26,19 +26,19 @@ class FieldValidation {
       return 'Debe tener al menos 9 caracteres.';
     }
 
-    if (!password.contains(RegExp(r'[A-Z]'))) {
+    if (!password.contains(RegExp(r'[A-Z]+'))) {
       return 'Debe contener al menos una letra mayúscula.';
     }
 
-    if (!password.contains(RegExp(r'[a-z]'))) {
+    if (!password.contains(RegExp(r'[a-z]+'))) {
       return 'Debe contener al menos una letra minúscula.';
     }
 
-    if (!password.contains(RegExp(r'[0-9]'))) {
+    if (!password.contains(RegExp(r'[0-9]+'))) {
       return 'Debe contener al menos un número.';
     }
 
-    if (!password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+    if (!password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]+'))) {
       return 'Debe contener al menos un símbolo (ej.: !@#\$).';
     }
 
