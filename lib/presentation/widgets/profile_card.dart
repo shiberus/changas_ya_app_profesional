@@ -1,4 +1,6 @@
 import 'package:changas_ya_app/presentation/providers/profile_provider.dart';
+import 'package:changas_ya_app/presentation/providers/rating_provider.dart';
+import 'package:changas_ya_app/presentation/widgets/rating_chip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -91,20 +93,7 @@ class ProfileCard extends ConsumerWidget {
                           ),
                           const SizedBox(width: 8),
                           if (profile.isProfessional)
-                            Chip(
-                              label: Text(
-                                // Usa el rating o un valor por defecto si es null
-                                'Cal. ${(profile.rating).toStringAsFixed(1)}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              backgroundColor: Colors.green.shade500,
-                              padding: EdgeInsets.zero,
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                            ),
+                            RatingChip(profileId: profileId)
                         ],
                       ),
                       // Mostramos en caso de que sea profesional y tenga trabajos completados
