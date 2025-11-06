@@ -35,6 +35,21 @@ class JobNotifier extends StateNotifier<List<Job>> {
     }
   }
 
+  Future<void> assignJob(String jobId, String workerId, double budgetManPower, double budgetSpares) async {
+    try {
+      final jobRef = _db.collection('trabajos').doc(jobId);
+
+      await jobRef.update({
+        'status': 'En marcha',
+        'workerId': workerId,
+        'budgetManPower': budgetManPower,
+        'budgetSpares': budgetSpares,
+      });
+    } catch (e) {
+      print('Error al asignar el trabajo $jobId al worker $workerId: $e');
+    }
+  }
+  
   Future<void> addJob(Map<String, dynamic> jobData) async {
     try {
       final completeJobData = {...jobData, 'clientId': _currentClientId};

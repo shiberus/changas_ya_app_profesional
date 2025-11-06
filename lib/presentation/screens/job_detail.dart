@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:changas_ya_app/Domain/Job/job.dart';
+import 'package:go_router/go_router.dart';
 
 class JobDetail extends ConsumerWidget {
   static const name = 'Job Detail';
@@ -93,7 +94,11 @@ class JobDetail extends ConsumerWidget {
                         height: 50.0,
                         child: ElevatedButton(
                           onPressed: () {
-                            print("Botón: Ver Postulaciones Presionado");
+                            final jobId = job.id;
+                            context.pushNamed(
+                              'bids', 
+                              pathParameters: {'jobId': jobId}, 
+                            );
                           },
                           child: const Text("Ver Postulaciones"),
                         ),
