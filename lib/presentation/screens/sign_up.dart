@@ -1,5 +1,5 @@
 import 'package:changas_ya_app/Domain/Auth_exception/auth_exception.dart';
-import 'package:changas_ya_app/Domain/User/user.dart';
+import 'package:changas_ya_app/Domain/Profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:changas_ya_app/core/Services/field_validation.dart';
 import 'package:changas_ya_app/presentation/components/banner_widget.dart';
@@ -43,11 +43,18 @@ class SignUp extends ConsumerWidget {
     Future<void> submitRegister() async {
       String snackBarMessage = '';
       Color? snackBarColor = Colors.red[400];
+      bool userIsWorker = false;
+      String emptyUserId = '';
 
       if (formkey.currentState!.validate()) {
-        User newUser = User(inputName, inputEmail, inputPassword);
+        Profile newUser = Profile(
+          uid: emptyUserId, 
+          name: inputName, 
+          email: inputEmail, 
+          isWorker: userIsWorker);
+
         try {
-          await auth.registerUser(newUser);
+          await auth.registerUser(newUser, inputPassword);
 
           snackBarMessage = '¡Usuario registraso con exito!';
           snackBarColor = Colors.green[400];

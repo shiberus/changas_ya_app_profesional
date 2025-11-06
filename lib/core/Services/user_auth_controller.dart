@@ -1,14 +1,18 @@
 import 'package:changas_ya_app/Domain/Auth_exception/auth_exception.dart';
+import 'package:changas_ya_app/Domain/Profile/profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// Cambiar por Profile.dart en cuanto se reciban los cambios.
-// Se ustiliza un alias para evitar conflictos.
-import 'package:changas_ya_app/Domain/User/user.dart' as app_user;
-//import 'package:changas_ya_app/Domain/User/user.dart';
+import 'package:changas_ya_app/core/data/profile_repository.dart';
 
 class UserAuthController {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  final FirebaseAuth _auth;
+  final ProfileRepository _profileRepository;
+  
+  
+  UserAuthController({FirebaseAuth? auth, ProfileRepository? profileRepository }): //<--
+    _auth = auth ?? FirebaseAuth.instance,
+    _profileRepository = profileRepository ?? ProfileRepository(FirebaseFirestore.instance);
 
   /// Función asíncrona para el registro de usuario en Firebase.
   ///
@@ -18,19 +22,21 @@ class UserAuthController {
   /// @returns: (bool, String)
   //Firma original del método.
   //Future<void> registerUser(String email, String password) async {
-  Future<void> registerUser(app_user.User newUser) async {
+  Future<void> registerUser(Profile newUser, String userPassword) async {
     String errorCode = '';
     String errorMessage = '';
+    String? userUuid;
     try {
       await _auth.createUserWithEmailAndPassword(
-        email: newUser.getEmail(),
-        password: newUser.getPassword(),
+        email: newUser.email,
+        password: userPassword,
       );
 
-      // TODO: Cambiar método por el que se va a utilizar en el repository de Firebase.
-      // También se puede crear un perfil en Firestore/RealtimeDB desde aquí
-      // usando los datos de `newUser`.
-      await registerUserProfile(newUser);
+      userUuid = getuserUid();
+            
+
+      await _profileRepository.registerUserProfile(newUser, userUuid);
+
     } on FirebaseAuthException catch (e) {
       errorCode = e.code;
       switch (e.code) {
@@ -162,24 +168,5 @@ class UserAuthController {
   }
 
 
-  // Esta fucnión está acá por motivos de prueba para el flujo de registro.
-  Future<void> registerUserProfile(app_user.User data) async {
-    final String dbCollection = "usuarios";
-    final String userId = getuserUid() ?? _db.collection(dbCollection).doc().id;
-    final userData = <String, String>{
-      "email": data.getEmail(),
-      "name": data.getName(),
-    };
 
-    await _db
-        .collection(dbCollection)
-        .doc(userId)
-        .set(userData)
-        .onError(
-          (e, _) => throw AuthException(
-            errorCode: "error de carga",
-            errorMessage: e.toString(),
-          ),
-        );
-  }
 }
