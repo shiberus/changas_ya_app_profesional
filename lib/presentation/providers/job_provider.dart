@@ -47,6 +47,17 @@ class JobNotifier extends StateNotifier<List<Job>> {
       });
     } catch (e) {
       print('Error al asignar el trabajo $jobId al worker $workerId: $e');
+    }
+  }
+  
+  Future<void> addJob(Map<String, dynamic> jobData) async {
+    try {
+      final completeJobData = {...jobData, 'clientId': _currentClientId};
+
+      await _db.collection('trabajos').add(completeJobData);
+      await getPublishedJobsByClient();
+    } catch (e) {
+      print('Error al crear job: $e');
       rethrow;
     }
   }

@@ -2,7 +2,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Job {
-
   final String id;
   final String title;
   final String status;
@@ -16,8 +15,8 @@ class Job {
   final double? budgetManpower;
   final double? budgetSpares;
 
-  final DateTime? dateStart; 
-  final DateTime? dateEnd; 
+  final DateTime? dateStart;
+  final DateTime? dateEnd;
 
   final String? paymentMethod;
 
@@ -27,7 +26,7 @@ class Job {
     required this.status,
     required this.imageUrls,
     required this.description,
-    required this.clientId, 
+    required this.clientId,
     required this.datePosted,
     this.budgetManpower,
     this.budgetSpares,
@@ -36,8 +35,6 @@ class Job {
     this.dateEnd,
     this.paymentMethod,
   });
-
-  
 
   double get budgetTotal {
     final manpower = budgetManpower ?? 0.0;
@@ -62,12 +59,12 @@ class Job {
     };
   }
 
-factory Job.fromFirestore(
+  factory Job.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
   ) {
     final data = snapshot.data();
-    
+
     // Función helper para convertir Timestamp a DateTime de forma segura
     DateTime? getDateTime(dynamic field) {
       if (field == null) return null;
@@ -79,23 +76,23 @@ factory Job.fromFirestore(
 
     return Job(
       // id: SIEMPRE se toma del ID del documento, no de un campo interno
-      id: snapshot.id, 
+      id: snapshot.id,
       title: data?['title'] ?? 'Sin título',
       status: data?['status'] ?? 'Desconocido',
-      
+
       // Conversión de Timestamp a DateTime. Usamos una aserción '!' porque 'datePosted' es requerido.
-      datePosted: getDateTime(data?['datePosted'])!, 
-      
+      datePosted: _getDateTime(data?['datePosted'])!,
+
       // Conversión segura de la lista
       imageUrls: List<String>.from(data?['imageUrls'] ?? []),
-      
+
       clientId: data?['clientId'] ?? '',
       description: data?['description'] ?? '',
-      
+
       // Presupuestos (manejo seguro de double)
       budgetManpower: data?['budgetManpower']?.toDouble(),
       budgetSpares: data?['budgetSpares']?.toDouble(),
-      
+
       // Campos opcionales
       workerId: data?['workerId'],
       dateStart: getDateTime(data?['dateStart']),

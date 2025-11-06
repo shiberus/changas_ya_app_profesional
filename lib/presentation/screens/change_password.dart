@@ -32,37 +32,20 @@ class _AppChangePassword extends State<ChangePassword> {
   // Key to indentify the form.
   final _changePasswordFormkey = GlobalKey<FormState>();
 
-  // Instance for authentication.
-  final UserAuthController _auth = UserAuthController();
-
-  // Validate the password change.
-  Future<void> _validateChange() async {
-    String snackBarMessage = '';
-    Color? snackBarColor = Colors.red[400];
-
+  void validateChange() {
+    String _snackBarMessage = '';
+    Color? _snackBarColor = Colors.black;
     if (_changePasswordFormkey.currentState!.validate()) {
-      try {
-        await _auth.changeUserPassword(
-          _inputEmail,
-          _inputOldPassword,
-          _inputNewPassword,
-        );
-        snackBarMessage = '¡Se cambió la contraseña!';
-        snackBarColor = Colors.green[400];
-      } on Exception catch (e) {
-        snackBarMessage = e.toString();
-      }
+      _snackBarMessage = '¡Se cambió la contraseña!';
+      _snackBarColor = Colors.green[400];
     } else {
-      snackBarMessage = 'Ocurrió un problema...';
+      _snackBarMessage = 'Ocurrió un problema...';
+      _snackBarColor = Colors.red[400];
     }
 
-    snackBarPopUp(snackBarMessage, snackBarColor);
-  }
-
-  void snackBarPopUp(String message, Color? background) {
-    SnackBar snackBar = SnackBar(
-      content: Text(message),
-      backgroundColor: background,
+    final SnackBar snackBar = SnackBar(
+      content: Text(_snackBarMessage),
+      backgroundColor: _snackBarColor,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
@@ -210,9 +193,9 @@ class _AppChangePassword extends State<ChangePassword> {
                   SizedBox(height: 20.0),
 
                   ElevatedButton(
-                    onPressed: ()  async {
+                    onPressed: () async {
                       await _validateChange();
-                      if (context.mounted){
+                      if (context.mounted) {
                         context.push('/');
                       }
                     },
