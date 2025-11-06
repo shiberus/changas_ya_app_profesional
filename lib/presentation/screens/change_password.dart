@@ -3,55 +3,72 @@ import 'package:changas_ya_app/presentation/components/banner_widget.dart';
 import 'package:changas_ya_app/core/Services/field_validation.dart';
 import 'package:changas_ya_app/presentation/components/app_bar.dart';
 import 'package:changas_ya_app/core/Services/user_auth_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:changas_ya_app/Domain/Auth_exception/auth_exception.dart';
 
-class ChangePassword extends StatefulWidget {
+class ChangePassword extends ConsumerWidget {
   static const String screenName = 'changePassword';
 
   const ChangePassword({super.key});
-
   @override
-  State<ChangePassword> createState() => _AppChangePassword();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
 
-class _AppChangePassword extends State<ChangePassword> {
   // Controllers for the text inputs and value storage attributes.
   late TextEditingController emailController = TextEditingController();
   late TextEditingController oldPasswordController = TextEditingController();
   late TextEditingController newPasswordController = TextEditingController();
   late TextEditingController confirmedNewPasswordController =
       TextEditingController();
-  String _inputEmail = '';
-  String _inputOldPassword = '';
-  String _inputNewPassword = '';
-  String _inputConfirmedNewPassword = '';
+  String inputEmail = '';
+  String inputOldPassword = '';
+  String inputNewPassword = '';
 
   // Intance for validation class.
   FieldValidation validation = FieldValidation();
 
   // Key to indentify the form.
-  final _changePasswordFormkey = GlobalKey<FormState>();
+  final changePasswordFormkey = GlobalKey<FormState>();
 
-  void validateChange() {
-    String _snackBarMessage = '';
-    Color? _snackBarColor = Colors.black;
-    if (_changePasswordFormkey.currentState!.validate()) {
-      _snackBarMessage = '¡Se cambió la contraseña!';
-      _snackBarColor = Colors.green[400];
+  // Instance for authentication.
+  final UserAuthController auth = UserAuthController();
+
+    void snackBarPopUp(String message, Color? background) {
+    SnackBar snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: background,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  // Validate the password change.
+  Future<bool> validateChange() async {
+    bool isPasswordChanged = false;
+    String snackBarMessage = '';
+    Color? snackBarColor = Colors.red[400];
+
+    if (changePasswordFormkey.currentState!.validate()) {
+      try {
+        await auth.changeUserPassword(
+          inputEmail,
+          inputOldPassword,
+          inputNewPassword,
+        );
+        snackBarMessage = '¡Se cambió la contraseña!';
+        snackBarColor = Colors.green[400];
+        isPasswordChanged = true;
+      } on AuthException catch (e) {
+        snackBarMessage = e.showErrorMessage();
+      }
     } else {
       _snackBarMessage = 'Ocurrió un problema...';
       _snackBarColor = Colors.red[400];
     }
 
-    final SnackBar snackBar = SnackBar(
-      content: Text(_snackBarMessage),
-      backgroundColor: _snackBarColor,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    snackBarPopUp(snackBarMessage, snackBarColor);
+    return isPasswordChanged;
   }
-
-  @override
-  Widget build(BuildContext context) {
+  
     // Insets for text field alignment
     final EdgeInsets textFieldsInset = EdgeInsets.symmetric(
       vertical: 10.0,
@@ -85,7 +102,7 @@ class _AppChangePassword extends State<ChangePassword> {
             ),
 
             Form(
-              key: _changePasswordFormkey,
+              key: changePasswordFormkey,
               child: Column(
                 children: [
                   //Email text field
@@ -95,9 +112,7 @@ class _AppChangePassword extends State<ChangePassword> {
                       controller: emailController,
                       onChanged: (String mailValue) {
                         if (emailController.text.isNotEmpty) {
-                          setState(() {
-                            _inputEmail = emailController.text;
-                          });
+                          inputEmail = emailController.text;
                         }
                       },
                       decoration: InputDecoration(
@@ -118,9 +133,7 @@ class _AppChangePassword extends State<ChangePassword> {
                       controller: oldPasswordController,
                       onChanged: (String passwordValue) {
                         if (oldPasswordController.text.isNotEmpty) {
-                          setState(() {
-                            _inputOldPassword = oldPasswordController.text;
-                          });
+                            inputOldPassword = oldPasswordController.text;
                         }
                       },
                       obscureText: true,
@@ -142,9 +155,7 @@ class _AppChangePassword extends State<ChangePassword> {
                       controller: newPasswordController,
                       onChanged: (String newPasswordValue) {
                         if (newPasswordController.text.isNotEmpty) {
-                          setState(() {
-                            _inputNewPassword = newPasswordController.text;
-                          });
+                            inputNewPassword = newPasswordController.text;
                         }
                       },
                       obscureText: true,
@@ -164,14 +175,6 @@ class _AppChangePassword extends State<ChangePassword> {
                     margin: textFieldsInset,
                     child: TextFormField(
                       controller: confirmedNewPasswordController,
-                      onChanged: (String confirmedPasswordValue) {
-                        if (confirmedNewPasswordController.text.isNotEmpty) {
-                          setState(() {
-                            _inputConfirmedNewPassword =
-                                confirmedNewPasswordController.text;
-                          });
-                        }
-                      },
                       obscureText: true,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
@@ -179,11 +182,11 @@ class _AppChangePassword extends State<ChangePassword> {
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (String? confirmedNewPassword) {
-                        if (_inputNewPassword.isEmpty) {
+                        if (inputNewPassword.isEmpty) {
                           return 'Primero ingrese una contraseña válida.';
                         }
                         return validation.confirmPassword(
-                          _inputNewPassword,
+                          inputNewPassword,
                           confirmedNewPassword,
                         );
                       },
@@ -193,9 +196,10 @@ class _AppChangePassword extends State<ChangePassword> {
                   SizedBox(height: 20.0),
 
                   ElevatedButton(
-                    onPressed: () async {
-                      await _validateChange();
-                      if (context.mounted) {
+                    onPressed: ()  async {
+                      bool passwordChanged = await validateChange();
+                    
+                      if (passwordChanged && context.mounted){
                         context.push('/');
                       }
                     },

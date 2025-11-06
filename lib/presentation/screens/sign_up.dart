@@ -1,67 +1,73 @@
-import 'package:changas_ya_app/Domain/User/user.dart';
+import 'package:changas_ya_app/Domain/Auth_exception/auth_exception.dart';
+import 'package:changas_ya_app/Domain/Profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:changas_ya_app/core/Services/field_validation.dart';
 import 'package:changas_ya_app/presentation/components/banner_widget.dart';
 import 'package:changas_ya_app/presentation/components/app_bar.dart';
 import 'package:changas_ya_app/core/Services/user_auth_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SignUp extends StatefulWidget {
+class SignUp extends ConsumerWidget {
   static const String name = 'signup';
+
   const SignUp({super.key});
 
   @override
-  State<SignUp> createState() => _AppSignUp();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    //Instance for validation
+    FieldValidation validation = FieldValidation();
 
-class _AppSignUp extends State<SignUp> {
-  //Instance for validation
-  FieldValidation validation = FieldValidation();
+    late TextEditingController nameController = TextEditingController();
+    late TextEditingController emailController = TextEditingController();
+    late TextEditingController passwordController = TextEditingController();
+    late TextEditingController confirmedPassController =
+        TextEditingController();
+    String inputName = '';
+    String inputEmail = '';
+    String inputPassword = '';
+    //String inputConfirmedPassword = '';
 
-  late TextEditingController nameController = TextEditingController();
-  late TextEditingController emailController = TextEditingController();
-  late TextEditingController passwordController = TextEditingController();
-  late TextEditingController confirmedPassController = TextEditingController();
-  String _inputName = '';
-  String _inputEmail = '';
-  String _inputPassword = '';
-  String _inputConfirmedPassword = '';
+    // Key to identify the form.
+    final formkey = GlobalKey<FormState>();
+    final UserAuthController auth = UserAuthController();
 
-  // Key to identify the form.
-  final _formkey = GlobalKey<FormState>();
-  final UserAuthController _auth = UserAuthController();
-
-  // Use the form data, validate it and submmit it to the data base.
-  Future<void> _submitRegister() async {
-    String snackBarMessage = '';
-    Color? snackBarColor = Colors.red[400];
-
-    if (_formkey.currentState!.validate()) {
-      User newUser = User(_inputName, _inputEmail, _inputPassword);
-      try {
-        await _auth.registerUser(newUser.getEmail(), newUser.getPassword());
-
-        snackBarMessage = '¡Usuario registraso con exito!';
-        snackBarColor = Colors.green[400];
-      } on Exception catch (e) {
-        snackBarMessage = e.toString();
-      }
-    } else {
-      snackBarMessage = 'Verifique los valores ingresados en el formulario.';
+    void snackBarPopUp(String message, Color? background) {
+      SnackBar snackBar = SnackBar(
+        content: Text(message),
+        backgroundColor: background,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
-    _snackBarPopUp(snackBarMessage, snackBarColor);
-  }
+    // Use the form data, validate it and submmit it to the data base.
+    Future<void> submitRegister() async {
+      String snackBarMessage = '';
+      Color? snackBarColor = Colors.red[400];
+      bool userIsWorker = false;
+      String emptyUserId = '';
 
-  void _snackBarPopUp(String message, Color? background) {
-    SnackBar snackBar = SnackBar(
-      content: Text(message),
-      backgroundColor: background,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+      if (formkey.currentState!.validate()) {
+        Profile newUser = Profile(
+          uid: emptyUserId, 
+          name: inputName, 
+          email: inputEmail, 
+          isWorker: userIsWorker);
 
-  @override
-  Widget build(BuildContext context) {
+        try {
+          await auth.registerUser(newUser, inputPassword);
+
+          snackBarMessage = '¡Usuario registraso con exito!';
+          snackBarColor = Colors.green[400];
+        } on AuthException catch (e) {
+          snackBarMessage = e.showErrorMessage();
+        }
+      } else {
+        snackBarMessage = 'Verifique los valores ingresados en el formulario.';
+      }
+
+      snackBarPopUp(snackBarMessage, snackBarColor);
+    }
+
     final EdgeInsets textFieldsInset = EdgeInsets.symmetric(
       vertical: 10.0,
       horizontal: 20.0,
@@ -94,7 +100,7 @@ class _AppSignUp extends State<SignUp> {
 
             //Form for user register.
             Form(
-              key: _formkey,
+              key: formkey,
               child: Column(
                 children: [
                   // User name
@@ -104,9 +110,7 @@ class _AppSignUp extends State<SignUp> {
                       controller: nameController,
                       onChanged: (String nameValue) {
                         if (nameController.text.isNotEmpty) {
-                          setState(() {
-                            _inputName = nameController.text;
-                          });
+                          inputName = nameController.text;
                         }
                       },
                       obscureText: false,
@@ -124,9 +128,7 @@ class _AppSignUp extends State<SignUp> {
                       controller: emailController,
                       onChanged: (String mailValue) {
                         if (emailController.text.isNotEmpty) {
-                          setState(() {
-                            _inputEmail = emailController.text;
-                          });
+                          inputEmail = emailController.text;
                         }
                       },
                       decoration: InputDecoration(
@@ -147,9 +149,7 @@ class _AppSignUp extends State<SignUp> {
                       controller: passwordController,
                       onChanged: (String passwordValue) {
                         if (passwordController.text.isNotEmpty) {
-                          setState(() {
-                            _inputPassword = passwordController.text;
-                          });
+                          inputPassword = passwordController.text;
                         }
                       },
                       obscureText: true,
@@ -170,12 +170,10 @@ class _AppSignUp extends State<SignUp> {
                     child: TextFormField(
                       controller: confirmedPassController,
                       onChanged: (String confirmedPasswordValue) {
-                        if (confirmedPassController.text.isNotEmpty) {
-                          setState(() {
-                            _inputConfirmedPassword =
-                                confirmedPassController.text;
-                          });
-                        }
+                        // if (confirmedPassController.text.isNotEmpty) {
+                        //     _inputConfirmedPassword =
+                        //         confirmedPassController.text;
+                        // }
                       },
                       obscureText: true,
                       decoration: InputDecoration(
@@ -184,11 +182,11 @@ class _AppSignUp extends State<SignUp> {
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (String? confirmedPassword) {
-                        if (_inputPassword.isEmpty) {
+                        if (inputPassword.isEmpty) {
                           return 'Primero ingrese una contraseña válida.';
                         }
                         return validation.confirmPassword(
-                          _inputPassword,
+                          inputPassword,
                           confirmedPassword,
                         );
                       },
@@ -199,7 +197,7 @@ class _AppSignUp extends State<SignUp> {
 
                   ElevatedButton(
                     onPressed: () async {
-                      await _submitRegister();
+                      await submitRegister();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue[400],
