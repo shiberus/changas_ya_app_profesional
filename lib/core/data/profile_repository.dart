@@ -37,9 +37,10 @@ class ProfileRepository {
   Future<void> registerUserProfile(Profile data, String? uuid) async {
     final String dbCollection = "usuarios";
     final String userId = uuid ?? _db.collection(dbCollection).doc().id;
-    final userData = <String, String>{
+    final userData = <String, dynamic>{
       "email": data.email,
       "name": data.name,
+      "isWorker": data.isWorker,
     };
 
     await _db

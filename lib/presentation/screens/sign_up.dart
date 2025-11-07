@@ -6,6 +6,7 @@ import 'package:changas_ya_app/presentation/components/banner_widget.dart';
 import 'package:changas_ya_app/presentation/components/app_bar.dart';
 import 'package:changas_ya_app/core/Services/user_auth_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class SignUp extends ConsumerWidget {
   static const String name = 'signup';
@@ -40,10 +41,11 @@ class SignUp extends ConsumerWidget {
     }
 
     // Use the form data, validate it and submmit it to the data base.
-    Future<void> submitRegister() async {
+    Future<bool> submitRegister() async {
       String snackBarMessage = '';
       Color? snackBarColor = Colors.red[400];
       bool userIsWorker = false;
+      bool registerSucced = false;
       String emptyUserId = '';
 
       if (formkey.currentState!.validate()) {
@@ -56,6 +58,7 @@ class SignUp extends ConsumerWidget {
         try {
           await auth.registerUser(newUser, inputPassword);
 
+          registerSucced = true;
           snackBarMessage = '¡Usuario registraso con exito!';
           snackBarColor = Colors.green[400];
         } on AuthException catch (e) {
@@ -66,6 +69,7 @@ class SignUp extends ConsumerWidget {
       }
 
       snackBarPopUp(snackBarMessage, snackBarColor);
+      return registerSucced;
     }
 
     final EdgeInsets textFieldsInset = EdgeInsets.symmetric(
@@ -197,7 +201,10 @@ class SignUp extends ConsumerWidget {
 
                   ElevatedButton(
                     onPressed: () async {
-                      await submitRegister();
+                      bool isRegitered = await submitRegister();
+                      if (isRegitered && context.mounted){
+                        context.go("/login");
+                      } 
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue[400],
