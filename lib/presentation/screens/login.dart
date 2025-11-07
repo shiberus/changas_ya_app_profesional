@@ -155,7 +155,7 @@ class AppLogin extends ConsumerWidget {
                       );
                       if (await validateUserCredentials(userToAuthenticate) &&
                           context.mounted) {
-                        context.push('/');
+                        context.go('/');
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -196,7 +196,9 @@ class AppLogin extends ConsumerWidget {
                   ),
                   //TextButton(onPressed: () => { context.push(/nosotros)}, child: Text("Nosotros", style: textStyle.labelMedium)),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.push('/nosotros');
+                    },
                     child: Text("Nosotros", style: textStyle.labelMedium),
                   ),
                 ],
