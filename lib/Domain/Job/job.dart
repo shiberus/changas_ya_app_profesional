@@ -81,7 +81,7 @@ class Job {
       status: data?['status'] ?? 'Desconocido',
 
       // Conversión de Timestamp a DateTime. Usamos una aserción '!' porque 'datePosted' es requerido.
-      datePosted: _getDateTime(data?['datePosted'])!,
+      datePosted: getDateTime(data?['datePosted'])!,
 
       // Conversión segura de la lista
       imageUrls: List<String>.from(data?['imageUrls'] ?? []),
