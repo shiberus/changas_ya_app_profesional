@@ -27,8 +27,7 @@ class JobDetail extends ConsumerWidget {
       }
     });
 
-    final selectedRating = 0;
-    // final selectedRating = ref.watch(ratingProvider(jobId));
+
     final selectedPayment = ref.watch(paymentMethodProvider(jobId));
 
     return Scaffold(
@@ -81,8 +80,7 @@ class JobDetail extends ConsumerWidget {
                       ),
 
                       const SizedBox(height: 20),
-                      Text('Fecha de inicio: ${job.dateStart}'),
-                      Text('Fecha de fin: ${job.dateEnd}'),
+                      Text('Fecha de inicio: ${job.dateStart}')
                     ],
                   )
                 : Column(
