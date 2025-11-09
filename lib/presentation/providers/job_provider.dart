@@ -61,6 +61,20 @@ class JobNotifier extends StateNotifier<List<Job>> {
       rethrow;
     }
   }
+
+  Future<int> countJobsByWorkerId(String workerId) async {
+    try {
+      final Query query = _db.collection('trabajos')
+        .where('workerId', isEqualTo: workerId)
+        .where('status', isEqualTo: 'Finalizado');
+      final aggregateSnapshot = await query.count().get();
+      final int? totalJobs = aggregateSnapshot.count; 
+      return totalJobs ?? 0;
+    } catch (e) {
+      print("Error desconocido al contar trabajos: $e");
+      return 0;
+    }
+  }
 }
 
 final jobProvider = StateNotifierProvider<JobNotifier, List<Job>>((ref) {
@@ -68,4 +82,9 @@ final jobProvider = StateNotifierProvider<JobNotifier, List<Job>>((ref) {
   final db = ref.watch(firebaseFirestoreProvider);
 
   return JobNotifier(clientId, db);
+});
+
+final totalJobsProvider = FutureProvider.family<int, String>((ref, workerId) async {
+  final jobNotifier = ref.read(jobProvider.notifier);
+  return jobNotifier.countJobsByWorkerId(workerId);
 });
