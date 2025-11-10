@@ -45,6 +45,7 @@ class JobNotifier extends StateNotifier<List<Job>> {
         'budgetManPower': budgetManPower,
         'budgetSpares': budgetSpares,
       });
+      await getPublishedJobsByClient();
     } catch (e) {
       print('Error al asignar el trabajo $jobId al worker $workerId: $e');
     }
@@ -73,6 +74,19 @@ class JobNotifier extends StateNotifier<List<Job>> {
     } catch (e) {
       print("Error desconocido al contar trabajos: $e");
       return 0;
+    }
+  }
+
+  Future<void> endJob(String jobId) async {
+    try {
+      final jobRef = _db.collection('trabajos').doc(jobId);
+      await jobRef.update({
+        'status': 'Finalizado',
+        'dateEnd': DateTime.now()
+      });
+      await getPublishedJobsByClient();
+    } catch (e) {
+      print('Error al finalizar el trabajo $jobId');
     }
   }
 }
