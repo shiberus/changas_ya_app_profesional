@@ -1,4 +1,5 @@
 import 'package:changas_ya_app/presentation/providers/job_detail_provider.dart';
+import 'package:changas_ya_app/presentation/widgets/create_bid_modal.dart';
 import 'package:changas_ya_app/presentation/widgets/profile_card.dart';
 import 'package:changas_ya_app/presentation/widgets/worker_section.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +13,19 @@ class JobDetail extends ConsumerWidget {
   final Job job;
 
   const JobDetail({super.key, required this.job});
+
+  void _showCreateBidModal(BuildContext context) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true, 
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) {
+          return CreateBidModal(jobId: job.id); 
+        },
+      );
+    }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -94,13 +108,9 @@ class JobDetail extends ConsumerWidget {
                         height: 50.0,
                         child: ElevatedButton(
                           onPressed: () {
-                            final jobId = job.id;
-                            context.pushNamed(
-                              'bids', 
-                              pathParameters: {'jobId': jobId}, 
-                            );
+                            _showCreateBidModal(context);
                           },
-                          child: const Text("Ver Postulaciones"),
+                          child: const Text("Realizar una Postulación"),
                         ),
                       ),
                       const SizedBox(height: 10),

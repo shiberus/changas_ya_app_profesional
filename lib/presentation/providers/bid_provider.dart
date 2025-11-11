@@ -15,3 +15,12 @@ final bidsStreamProvider = StreamProvider.family<List<Bid>, String>((ref, jobId)
   final repository = ref.watch(bidRepositoryProvider);
   return repository.streamBidsForJob(jobId);
 });
+
+// Provider para crear ofertas
+final createBidProvider = Provider((ref) {
+  final repository = ref.read(bidRepositoryProvider);
+
+  return (String jobId, Bid bid) async {
+    await repository.createBid(jobId, bid);
+  };
+});
