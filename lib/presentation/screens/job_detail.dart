@@ -1,6 +1,7 @@
 import 'package:changas_ya_app/presentation/providers/job_detail_provider.dart';
 import 'package:changas_ya_app/presentation/providers/job_provider.dart';
 import 'package:changas_ya_app/presentation/widgets/profile_card.dart';
+import 'package:changas_ya_app/presentation/widgets/rate_worker_card.dart';
 import 'package:changas_ya_app/presentation/widgets/worker_section.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -104,7 +105,7 @@ class JobDetail extends ConsumerWidget {
                                   SnackBar(content: Text(message)),
                                 );
 
-                                if(success) {
+                                if (success) {
                                   Navigator.pop(context);
                                 }
                               },
@@ -117,19 +118,23 @@ class JobDetail extends ConsumerWidget {
                                 ),
                                 shape: WidgetStateProperty.all(
                                   RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      25.0,
-                                    ),
+                                    borderRadius: BorderRadius.circular(25.0),
                                   ),
                                 ),
                               ),
                               child: const Text("Finalizar Trabajo"),
-        
-                              
                             )
                           : Text("Fecha finalizacion: ${job.formattedDateEnd}"),
 
                       const SizedBox(height: 20),
+
+                      if (job.status == "Finalizado") ...[
+                        const SizedBox(height: 20),
+                        RateWorkerCard(
+                          professionalId: job.workerId!,
+                          jobId: job.id,
+                        ),
+                      ],
                     ],
                   )
                 : Column(

@@ -1,18 +1,21 @@
 import 'package:changas_ya_app/Domain/Job/job.dart';
+import 'package:changas_ya_app/presentation/providers/auth_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-final currentClientIdProvider = StateProvider<String>(
-  (ref) => 'test-client-mock',
-);
 final firebaseFirestoreProvider = Provider((ref) => FirebaseFirestore.instance);
 
 class JobNotifier extends StateNotifier<List<Job>> {
   final String _currentClientId;
   final FirebaseFirestore _db;
 
-  JobNotifier(this._currentClientId, this._db) : super([]);
+  JobNotifier(this._currentClientId, this._db) : super([]) {
+    // Evitamos que se haga la primera carga porque puede estar trayendo el user 
+    if (_currentClientId.isNotEmpty && _currentClientId != 'invitado') {
+      getPublishedJobsByClient();
+    }
+  }
 
   Future<void> getPublishedJobsByClient() async {
     try {
@@ -92,7 +95,7 @@ class JobNotifier extends StateNotifier<List<Job>> {
 }
 
 final jobProvider = StateNotifierProvider<JobNotifier, List<Job>>((ref) {
-  final clientId = ref.watch(currentClientIdProvider);
+  final clientId = ref.watch(currentUserIdProvider);
   final db = ref.watch(firebaseFirestoreProvider);
 
   return JobNotifier(clientId, db);

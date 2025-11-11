@@ -1,4 +1,5 @@
 import 'package:changas_ya_app/Domain/Professional/professional.dart';
+import 'package:changas_ya_app/presentation/providers/auth_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,8 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// StreamProvider que escucha en tiempo real los trabajadores favoritos
 final favoriteWorkersProvider = StreamProvider<List<Professional>>((ref) async* {
   final db = FirebaseFirestore.instance;
-  final userId = FirebaseAuth.instance.currentUser?.uid;
-  if (userId == null) yield [];
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == 'invitado') {
+    yield [];
+    return;
+  }
 
   // Escuchamos el documento del usuario
   await for (final userSnap in db.collection('usuarios').doc(userId).snapshots()) {
