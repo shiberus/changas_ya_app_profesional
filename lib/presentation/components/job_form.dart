@@ -1,3 +1,7 @@
+import 'package:changas_ya_app/Domain/Profession/profession.dart';
+import 'package:changas_ya_app/core/data/profession_repository.dart';
+import 'package:changas_ya_app/presentation/widgets/profession_dropdown.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:changas_ya_app/presentation/components/banner_widget.dart';
@@ -21,6 +25,7 @@ class _JobFormState extends ConsumerState<JobForm> {
   bool _isLoading = false;
   List<File> _selectedImages = []; // Para futura implementación de imágenes
   String? _selectedOffice; // Para oficios relacionados
+  Profession? _selectedProfession;
 
   // Lista temporal de oficios - TODO: Mover a provider
   final List<String> _availableOffices = [
@@ -33,6 +38,10 @@ class _JobFormState extends ConsumerState<JobForm> {
     'Limpieza',
     'Reparaciones generales',
   ];
+
+
+
+
 
   @override
   void dispose() {
@@ -180,101 +189,17 @@ class _JobFormState extends ConsumerState<JobForm> {
                   },
                 ),
               ),
-
-              // Oficios relacionados - Dropdown mejorado
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Oficios relacionados',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Selecciona el oficio necesario',
-                        prefixIcon: Icon(Icons.build_outlined),
-                      ),
-                      value: _selectedOffice,
-                      isExpanded: true,
-                      items: _availableOffices.map((office) {
-                        return DropdownMenuItem<String>(
-                          value: office,
-                          child: Row(
-                            children: [
-                              Icon(
-                                _getOfficeIcon(office),
-                                size: 20,
-                                color: Colors.blue[600],
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(child: Text(office)),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedOffice = value;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Selecciona un oficio';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Selecciona el oficio principal que consideras necesario para realizar el trabajo',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.blue[700],
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Presupuesto
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 10.0),
-                child: TextFormField(
-                  controller: _budgetController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Presupuesto disponible',
-                    hintText: 'Ingresa tu presupuesto máximo',
-                    prefixIcon: Icon(Icons.attach_money),
-                    prefixText: '\$ ',
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      final budget = double.tryParse(value);
-                      if (budget == null || budget <= 0) {
-                        return 'Ingresa un presupuesto válido mayor a 0';
-                      }
-                      if (budget > 1000000) {
-                        return 'El presupuesto no puede ser mayor a \$1,000,000';
-                      }
-                    }
-                    return null;
-                  },
-                ),
+              
+              ProfessionDropdown(
+                onChanged: (profession) {
+                  setState(() {
+                    _selectedProfession = profession;
+                  });
+                },
               ),
 
               const SizedBox(height: 30),
 
-              // Botón Publicar con estilo mejorado
               ElevatedButton(
                 onPressed: _isLoading ? null : _handleSubmit,
                 style: ElevatedButton.styleFrom(
@@ -405,12 +330,9 @@ class _JobFormState extends ConsumerState<JobForm> {
             ? double.parse(_budgetController.text)
             : null,
         'imageUrls': [], // Por ahora vacio hasta implementar iel mage_picker
-        'relatedOffices': _selectedOffice != null ? [_selectedOffice!] : [],
+        'relatedOffice': _selectedProfession?.id,
         'datePosted': DateTime.now(),
       };
-
-      print(' DATOS QUE SE ENVÍAN AL PROVIDER:');
-      print(jobData);
 
       await widget.onSubmit(jobData);
 

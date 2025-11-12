@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:changas_ya_app/presentation/components/job_form.dart';
-import 'package:changas_ya_app/presentation/components/app_bar.dart';
 import 'package:changas_ya_app/presentation/providers/job_provider.dart';
 import 'package:changas_ya_app/presentation/providers/navigation_provider.dart';
 
