@@ -1,26 +1,32 @@
 import 'package:changas_ya_app/Domain/Job/job.dart';
-import 'package:changas_ya_app/presentation/providers/auth_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
-final currentClientIdProvider = StateProvider<String>((ref) {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    return user.uid;
-  }
-  return 'anonymous-user';
+final firebaseAuthProvider = Provider((ref) => FirebaseAuth.instance);
+
+final authStateChangesProvider = StreamProvider<User?>((ref) {
+  return ref.watch(firebaseAuthProvider).authStateChanges();
+});
+
+final currentUserIdProvider = Provider<String>((ref) {
+  final authState = ref.watch(authStateChangesProvider);
+  
+  return authState.maybeWhen(
+    data: (user) => user?.uid ?? 'invitado',
+    orElse: () => 'invitado', 
+  );
 });
 
 final firebaseFirestoreProvider = Provider((ref) => FirebaseFirestore.instance);
+
 
 class JobNotifier extends StateNotifier<List<Job>> {
   final String _currentClientId;
   final FirebaseFirestore _db;
 
   JobNotifier(this._currentClientId, this._db) : super([]) {
-    // Evitamos que se haga la primera carga porque puede estar trayendo el user 
     if (_currentClientId.isNotEmpty && _currentClientId != 'invitado') {
       getPublishedJobsByClient();
     }
@@ -28,13 +34,10 @@ class JobNotifier extends StateNotifier<List<Job>> {
 
   Future<void> getPublishedJobsByClient() async {
     try {
-      if (_currentClientId == 'anonymous-user') {
-        print('⚠️ Usuario no autenticado, no se pueden cargar trabajos');
+      if (_currentClientId == 'invitado') {
         state = [];
         return;
       }
-
-      print('🔍 Cargando trabajos para cliente: $_currentClientId');
 
       final jobsCollection = _db
           .collection('trabajos')
@@ -50,9 +53,8 @@ class JobNotifier extends StateNotifier<List<Job>> {
       final jobs = snapshot.docs.map((doc) => doc.data()).toList();
 
       state = jobs;
-      print('✅ Trabajos cargados: ${jobs.length}');
     } catch (e) {
-      print('❌ Error al cargar trabajos: $e');
+      print('Error al cargar trabajos publicados desde Firebase: $e');
       state = [];
     }
   }
@@ -75,7 +77,7 @@ class JobNotifier extends StateNotifier<List<Job>> {
   
   Future<void> addJob(Map<String, dynamic> jobData) async {
     try {
-      if (_currentClientId == 'anonymous-user') {
+      if (_currentClientId == 'invitado') {
         throw Exception('Debes iniciar sesión para crear un trabajo');
       }
 
@@ -86,13 +88,8 @@ class JobNotifier extends StateNotifier<List<Job>> {
         'updatedAt': DateTime.now(),
       };
 
-      print('DATOS COMPLETOS QUE SE GUARDAN EN FIREBASE:');
-      print(completeJobData);
-
       await _db.collection('trabajos').add(completeJobData);
       await getPublishedJobsByClient();
-
-      print('Job creado exitosamente por cliente: $_currentClientId');
     } catch (e) {
       print('Error al crear trabajo: $e');
       rethrow;
@@ -137,4 +134,13 @@ final jobProvider = StateNotifierProvider<JobNotifier, List<Job>>((ref) {
 final totalJobsProvider = FutureProvider.family<int, String>((ref, workerId) async {
   final jobNotifier = ref.read(jobProvider.notifier);
   return jobNotifier.countJobsByWorkerId(workerId);
+});
+
+
+final jobInitializerProvider = Provider<void>((ref) {
+  ref.listen<String>(currentUserIdProvider, (previousId, newId) {
+    if (previousId == 'invitado' && newId != 'invitado') {
+      ref.invalidate(jobProvider);
+    }
+  });
 });

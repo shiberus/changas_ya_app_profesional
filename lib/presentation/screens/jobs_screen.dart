@@ -17,23 +17,26 @@ class _JobScreenState extends ConsumerState<JobsScreen> {
   @override
   void initState() {
     super.initState();
-    ref.read(jobProvider.notifier).getPublishedJobsByClient();
   }
 
-  @override
   Widget build(BuildContext context) {
+    final String clientId = ref.watch(currentUserIdProvider); 
     final List<Job> jobs = ref.watch(jobProvider);
+
+    final bool isLoading = jobs.isEmpty && clientId == 'invitado'; 
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Trabajos'),
         centerTitle: true,
       ),
-      body: jobs.isEmpty
+      body: isLoading
           ? const Center(child: CircularProgressIndicator()) 
-          : _JobsView(jobs: jobs),
+          : jobs.isEmpty
+              ? const Center(child: Text('Aún no has publicado ningún trabajo.'))
+              : _JobsView(jobs: jobs),
     );
-  }
+}
 }
 
 class _JobsView extends StatelessWidget {
