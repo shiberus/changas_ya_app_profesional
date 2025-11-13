@@ -12,9 +12,9 @@ class CreateJobScreen extends ConsumerWidget {
     return Scaffold(
       body: SingleChildScrollView(
         child: JobForm(
-          onSubmit: (formData) async {
+          onSubmit: (formData, images) async {
             try {
-              await ref.read(jobProvider.notifier).addJob(formData);
+              await ref.read(jobProvider.notifier).addJob(formData, images);
 
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(

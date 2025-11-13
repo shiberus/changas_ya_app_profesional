@@ -1,16 +1,16 @@
 import 'package:changas_ya_app/Domain/Profession/profession.dart';
-import 'package:changas_ya_app/core/data/profession_repository.dart';
 import 'package:changas_ya_app/presentation/widgets/profession_dropdown.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:changas_ya_app/presentation/components/banner_widget.dart';
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class JobForm extends ConsumerStatefulWidget {
-  final Future<void> Function(Map<String, dynamic>) onSubmit;
+  Future<void> Function(Map<String, dynamic> jobData, List<File> images)
+  onSubmit;
 
-  const JobForm({super.key, required this.onSubmit});
+  JobForm({super.key, required this.onSubmit});
 
   @override
   ConsumerState<JobForm> createState() => _JobFormState();
@@ -23,25 +23,11 @@ class _JobFormState extends ConsumerState<JobForm> {
   final _budgetController = TextEditingController();
 
   bool _isLoading = false;
+
+  final ImagePicker _picker = ImagePicker();
+
   List<File> _selectedImages = []; // Para futura implementación de imágenes
-  String? _selectedOffice; // Para oficios relacionados
   Profession? _selectedProfession;
-
-  // Lista temporal de oficios - TODO: Mover a provider
-  final List<String> _availableOffices = [
-    'Plomería',
-    'Electricidad',
-    'Carpintería',
-    'Pintura',
-    'Albañilería',
-    'Jardinería',
-    'Limpieza',
-    'Reparaciones generales',
-  ];
-
-
-
-
 
   @override
   void dispose() {
@@ -124,10 +110,7 @@ class _JobFormState extends ConsumerState<JobForm> {
                         color: Colors.grey[50],
                       ),
                       child: InkWell(
-                        onTap: () {
-                          // TODO: Implementar image_picker
-                          _showImagePickerDialog();
-                        },
+                        onTap: _pickImages,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -275,24 +258,74 @@ class _JobFormState extends ConsumerState<JobForm> {
     );
   }
 
-  void _showImagePickerDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Seleccionar imágenes'),
-          content: const Text(
-            'La funcionalidad de subir imágenes estará disponible próximamente.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Entendido'),
-            ),
-          ],
+  Future<void> _pickImages() async {
+    try {
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+
+      if (pickedFiles == null || pickedFiles.isEmpty) return;
+
+      const int maxImages = 5;
+
+      if (pickedFiles.length > maxImages) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Solo podés subir hasta 5 imágenes.")),
         );
-      },
-    );
+        return;
+      }
+
+      const int maxFileSize = 5 * 1024 * 1024; // son 5mb
+
+      for (final xfile in pickedFiles) {
+        final file = File(xfile.path);
+        final fileSize = file.lengthSync();
+
+        if (fileSize > maxFileSize) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Una de las imágenes supera el límite de 5MB: ${xfile.name}",
+              ),
+            ),
+          );
+          return;
+        }
+      }
+
+      final allowedExtensions = ['jpg', 'jpeg', 'png'];
+
+      for (final xfile in pickedFiles) {
+        final ext = xfile.name.split('.').last.toLowerCase();
+
+        if (!allowedExtensions.contains(ext)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Formato no permitido: ${xfile.name}. Solo JPG o PNG.",
+              ),
+            ),
+          );
+          return;
+        }
+      }
+
+      setState(() {
+        _selectedImages = pickedFiles.map((xfile) => File(xfile.path)).toList();
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("${pickedFiles.length} imágenes seleccionadas."),
+        ),
+      );
+    } catch (e) {
+      print("Error seleccionando imágenes: $e");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Ocurrió un error al seleccionar imágenes."),
+        ),
+      );
+    }
   }
 
   Future<void> _handleSubmit() async {
@@ -313,14 +346,13 @@ class _JobFormState extends ConsumerState<JobForm> {
         'datePosted': DateTime.now(),
       };
 
-      await widget.onSubmit(jobData);
+      await widget.onSubmit(jobData, _selectedImages);
 
       // Limpiar formulario
       _titleController.clear();
       _descriptionController.clear();
       _budgetController.clear();
       setState(() {
-        _selectedOffice = null;
         _selectedImages = [];
       });
     } catch (e) {

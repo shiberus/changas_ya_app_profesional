@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:changas_ya_app/Domain/Job/job.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -75,20 +78,41 @@ class JobNotifier extends StateNotifier<List<Job>> {
     }
   }
   
-  Future<void> addJob(Map<String, dynamic> jobData) async {
+  Future<void> addJob(Map<String, dynamic> jobData, List<File> images) async {
     try {
       if (_currentClientId == 'invitado') {
         throw Exception('Debes iniciar sesión para crear un trabajo');
       }
 
+      // Generamos un id para despues guardar ahi y tenerlo de refe para las imagenes
+      final jobRef = _db.collection('trabajos').doc();
+      final jobId = jobRef.id;
+
+      final List<String> imageUrls = [];
+
+      for (int i = 0; i < images.length; i++) {
+        final file = images[i];
+
+        final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('trabajos/$_currentClientId/$jobId/image_$i.jpg');
+
+        final uploadTask = await storageRef.putFile(file);
+
+        final url = await uploadTask.ref.getDownloadURL();
+        imageUrls.add(url);
+      }
+
       final completeJobData = {
         ...jobData,
         'clientId': _currentClientId,
+        'imageUrls': imageUrls,
         'createdAt': DateTime.now(),
         'updatedAt': DateTime.now(),
       };
 
-      await _db.collection('trabajos').add(completeJobData);
+      await jobRef.set(completeJobData);
+
       await getPublishedJobsByClient();
     } catch (e) {
       print('Error al crear trabajo: $e');
