@@ -5,6 +5,7 @@ import 'package:changas_ya_app/presentation/screens/home_screen.dart';
 import 'package:changas_ya_app/presentation/screens/job_detail.dart';
 import 'package:changas_ya_app/presentation/screens/jobs_screen.dart';
 import 'package:changas_ya_app/presentation/screens/login.dart';
+import 'package:changas_ya_app/presentation/screens/profile_professional_screen.dart';
 import 'package:changas_ya_app/presentation/screens/sign_up.dart';
 import 'package:changas_ya_app/presentation/screens/change_password.dart';
 import 'package:changas_ya_app/presentation/screens/profile_screen.dart';
@@ -70,6 +71,14 @@ final appRouter = GoRouter(
     GoRoute(path: '/favoriteworkers',
       name: 'Favorite Workers',
       builder: (context, state) => const FavoriteWorkers(),
+    ),
+    GoRoute(path: 
+      '/profileProfessional/:profileId',
+      name: 'Profile Professional',
+      builder: (context, state) {
+        final profileId = state.pathParameters['profileId']!;
+        return ProfileProfesionalScreen(profileId: profileId);
+      }
     ),
   ],
 );

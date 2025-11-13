@@ -37,6 +37,7 @@ class Profile {
   
   final List<Opinion> opinions;
   final List<String> trades;
+  final List<String> favoritos;
 
   const Profile({
     required this.uid,
@@ -48,6 +49,7 @@ class Profile {
     this.photoUrl,
     this.opinions = const [],
     this.trades = const [], 
+    this.favoritos = const [],
   });
 
   factory Profile.fromFirestore(Map<String, dynamic> data, String id) {
@@ -69,6 +71,7 @@ class Profile {
       opinions: convertedOpinions, 
       
       trades: List<String>.from(data['trades'] ?? []),
+      favoritos: List<String>.from(data['favoritos'] ?? []),
     );
 }
 
@@ -84,6 +87,7 @@ class Profile {
       if (photoUrl != null) 'photoUrl': photoUrl,
       'opinions': opinionsAsMap, 
       'trades': trades,
+      'favoritos': favoritos,
     };
   }
 
