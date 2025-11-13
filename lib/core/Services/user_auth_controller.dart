@@ -14,14 +14,6 @@ class UserAuthController {
     _auth = auth ?? FirebaseAuth.instance,
     _profileRepository = profileRepository ?? ProfileRepository(FirebaseFirestore.instance);
 
-  /// Función asíncrona para el registro de usuario en Firebase.
-  ///
-  /// [email]: Correo electrónico del usuario.
-  /// [password] Contraseña ingresada por el usuario.
-  ///
-  /// @returns: (bool, String)
-  //Firma original del método.
-  //Future<void> registerUser(String email, String password) async {
   Future<void> registerUser(Profile newUser, String userPassword) async {
     String errorCode = '';
     String errorMessage = '';

@@ -4,8 +4,11 @@ import 'package:changas_ya_app/presentation/screens/favorite_workers.dart';
 import 'package:changas_ya_app/presentation/screens/jobs_screen.dart';
 import 'package:changas_ya_app/presentation/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:changas_ya_app/presentation/screens/nosotros_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:changas_ya_app/presentation/widgets/log_out_alert.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 final jobsScreenRefreshProvider = StateProvider<Future<void> Function()?>(
@@ -15,9 +18,12 @@ final jobsScreenRefreshProvider = StateProvider<Future<void> Function()?>(
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = ref.watch(selectedTabIndexProvider);
+    
+
 
     final List<Widget> screens = [
       const JobsScreen(),
@@ -55,13 +61,25 @@ class HomeScreen extends ConsumerWidget {
                 );
               },
             ),
+            // Item de prueba
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('editar perfil'),
+              onTap: () {
+                context.push("/editProfile");
+              },
+            ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Cerrar sesión'),
               onTap: () {
-                // TODO: implementar logout cuando esté lista la funcionalidad
-                Navigator.pop(context);
+                Navigator.pop(context); // <-- cierra el drawer menu.
+                showDialog(
+                  context: context,
+                  builder: (context) => LogOutAlert(),
+                );
+                //context.push("/logout");
               },
             ),
           ],
