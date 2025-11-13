@@ -1,5 +1,4 @@
 import 'package:changas_ya_app/presentation/providers/professional_provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:changas_ya_app/Domain/Profile/profile.dart';
