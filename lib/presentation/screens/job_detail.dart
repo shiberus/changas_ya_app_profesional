@@ -1,12 +1,11 @@
 import 'package:changas_ya_app/presentation/providers/job_detail_provider.dart';
 import 'package:changas_ya_app/presentation/widgets/create_bid_modal.dart';
-  import 'package:changas_ya_app/presentation/widgets/profile_card.dart';
-import 'package:changas_ya_app/presentation/widgets/worker_section.dart';
+import 'package:changas_ya_app/presentation/widgets/profile_card.dart';
+import 'package:changas_ya_app/presentation/widgets/rate_worker_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:changas_ya_app/Domain/Job/job.dart';
-import 'package:go_router/go_router.dart';
 
 class JobDetail extends ConsumerWidget {
   static const name = 'Job Detail';
@@ -75,7 +74,7 @@ class JobDetail extends ConsumerWidget {
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      WorkerSection(professionalId: job.workerId!),
+                      ProfileCard(profileId: job.clientId!),
                       Text(
                         "Medio de pago:",
                         style: Theme.of(context).textTheme.titleMedium,
@@ -97,7 +96,15 @@ class JobDetail extends ConsumerWidget {
                       const SizedBox(height: 20),
                       Text('Fecha de inicio: ${job.dateStart}'),
                       Text('Fecha de fin: ${job.dateEnd}'),
+                      if (job.status == "Finalizado") ...[
+                        const SizedBox(height: 20),
+                        RateWorkerCard(
+                          clientId: job.clientId!,
+                          jobId: job.id,
+                        ),
+                      ],
                     ],
+                    
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

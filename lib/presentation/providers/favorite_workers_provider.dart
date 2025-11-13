@@ -1,11 +1,12 @@
 import 'package:changas_ya_app/Domain/Professional/professional.dart';
+import 'package:changas_ya_app/Domain/Profile/profile.dart';
 import 'package:changas_ya_app/presentation/providers/auth_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// StreamProvider que escucha en tiempo real los trabajadores favoritos
-final favoriteWorkersProvider = StreamProvider<List<Professional>>((ref) async* {
+final favoriteWorkersProvider = StreamProvider<List<Profile>>((ref) async* {
   final db = FirebaseFirestore.instance;
   final userId = ref.watch(currentUserIdProvider);
   if (userId == 'invitado') {
@@ -33,35 +34,44 @@ final favoriteWorkersProvider = StreamProvider<List<Professional>>((ref) async* 
         .where(FieldPath.documentId, whereIn: favoriteIds)
         .get();
 
-    final professionals = querySnapshot.docs
+    final clients = querySnapshot.docs
         .where((doc) => doc.data()['isWorker'] == true)
         .map((doc) {
           final data = doc.data() as Map<String, dynamic>;
           data['id'] = doc.id;
-          return Professional.fromFirestore(data);
+          return Profile.fromFirestore(data, doc.id);
         })
         .toList();
 
-    yield professionals;
+    yield clients;
   }
 });
 
-/// Provider para manejar acciones sobre favoritos
 final favoriteWorkersActionsProvider = Provider((ref) {
   final db = FirebaseFirestore.instance;
-  final userId = FirebaseAuth.instance.currentUser?.uid;
+  final userId = ref.watch(currentUserIdProvider);
 
-  Future<void> removeFromFavorites(String workerId) async {
-    if (userId == null) return;
-    await db.collection('usuarios').doc(userId).update({
-      'favoritos': FieldValue.arrayRemove([workerId]),
-    });
+  Future<void> toggleFavorite(String workerId, bool isFavorite) async {
+    final userRef = db.collection('usuarios').doc(userId);
+
+    if (isFavorite) {
+      await userRef.update({
+        'favoritos': FieldValue.arrayRemove([workerId]),
+      });
+    } else {
+      await userRef.update({
+        'favoritos': FieldValue.arrayUnion([workerId]),
+      });
+    }
+
+    // 👇 Forzar recarga del provider después del cambio
+    ref.invalidate(favoriteWorkersProvider);
   }
 
-  return FavoriteWorkersActions(removeFromFavorites: removeFromFavorites);
+  return FavoriteWorkersActions(toggleFavorite: toggleFavorite);
 });
 
 class FavoriteWorkersActions {
-  final Future<void> Function(String workerId) removeFromFavorites;
-  const FavoriteWorkersActions({required this.removeFromFavorites});
+  final Future<void> Function(String workerId, bool isFavorite) toggleFavorite;
+  const FavoriteWorkersActions({required this.toggleFavorite});
 }
