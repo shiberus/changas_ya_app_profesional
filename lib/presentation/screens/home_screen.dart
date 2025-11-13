@@ -1,6 +1,8 @@
 import 'package:changas_ya_app/presentation/providers/navigation_provider.dart';
 import 'package:changas_ya_app/presentation/screens/jobs_explore_screen.dart';
+import 'package:changas_ya_app/presentation/screens/favorite_workers.dart';
 import 'package:changas_ya_app/presentation/screens/jobs_screen.dart';
+import 'package:changas_ya_app/presentation/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:changas_ya_app/presentation/screens/nosotros_screen.dart';
@@ -21,7 +23,7 @@ class HomeScreen extends ConsumerWidget {
       const JobsScreen(),
       const JobsExplorerScreen(),
       const Center(child: Text("Pantalla de Favoritos (Pendiente)")),
-      const Center(child: Text("Pantalla de Perfil (Pendiente)")),
+      const ProfileScreen(),
     ];
 
     return Scaffold(
