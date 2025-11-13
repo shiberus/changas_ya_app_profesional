@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RateWorkerCard extends ConsumerWidget {
-  final String professionalId;
+  final String clientId;
   final String jobId;
 
   const RateWorkerCard({
     super.key,
-    required this.professionalId,
+    required this.clientId,
     required this.jobId,
   });
 
@@ -31,7 +31,7 @@ class RateWorkerCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Calificar al profesional",
+              "Calificar al cliente",
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 10),
@@ -91,10 +91,10 @@ class RateWorkerCard extends ConsumerWidget {
                           final rating = Rating(
                             id: '',
                             reviewerId: currentUserId,
-                            reviewedId: professionalId,
+                            reviewedId: clientId,
                             jobId: jobId,
                             score: formState.score,
-                            reviewedType: 'worker',
+                            reviewedType: 'client',
                             comment: formState.comment
                           );
 

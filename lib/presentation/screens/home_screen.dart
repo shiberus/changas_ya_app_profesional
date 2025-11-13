@@ -28,7 +28,6 @@ class HomeScreen extends ConsumerWidget {
     final List<Widget> screens = [
       const JobsScreen(),
       const JobsExplorerScreen(),
-      const Center(child: Text("Pantalla de Favoritos (Pendiente)")),
       const ProfileScreen(),
     ];
 
@@ -110,11 +109,6 @@ class HomeScreen extends ConsumerWidget {
             icon: Icon(Icons.search_outlined),
             selectedIcon: Icon(Icons.search),
             label: 'Explorar',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.favorite_outline),
-            selectedIcon: Icon(Icons.favorite),
-            label: 'Favoritos',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),

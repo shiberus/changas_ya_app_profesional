@@ -42,7 +42,7 @@ class RatingRepository {
         final double finalSum = actualSum + scoreChange;
         final int finalCount = actualCount + countChange;
 
-        final double average = finalCount / finalSum;
+        final double average = finalSum / finalCount;
 
         transaction.set(
           ratingRef,
@@ -78,7 +78,7 @@ class RatingRepository {
     try {
       final doc = await _db.collection(_collectionProfileName).doc(reviewedId).get();
       if (doc.exists) {
-        final double? average = (doc.data()?['averageRating'] as num?)?.toDouble();
+        final double? average = (doc.data()?['ratingAvg'] as num?)?.toDouble();
         return average ?? 0; // average o 0 si no existe el average
       }
       return 0.0; // doc no existe
