@@ -5,6 +5,7 @@ class Rating {
   final String reviewerId;
   final String reviewedId;
   final String reviewedType;
+  final String comment;
 
   const Rating({
     required this.id,
@@ -12,7 +13,8 @@ class Rating {
     required this.score,
     required this.reviewerId,
     required this.reviewedId,
-    required this.reviewedType
+    required this.reviewedType, 
+    required this.comment
   });
 
   factory Rating.fromFirestore(Map<String, dynamic> map) {
@@ -23,6 +25,7 @@ class Rating {
       reviewerId: map['reviewerId'] as String,
       reviewedId: map['reviewedId'] as String,
       reviewedType: map['reviewedType'] as String,
+      comment: map['comment'] as String,
     );
   }
 
@@ -34,6 +37,7 @@ class Rating {
       'reviewerId': reviewerId,
       'reviewedId': reviewedId,
       'reviewedType': reviewedType,
+      'comment': comment,
     };
   }
 }
