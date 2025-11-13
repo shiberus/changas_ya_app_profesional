@@ -11,7 +11,7 @@ final totalJobsCountProvider = StateProvider<int?>((ref) => null);
 class JobNotifier extends StateNotifier<List<Job>> {
   final _currentClientId = FirebaseAuth.instance.currentUser;
   final FirebaseFirestore _db;
-  static const int pageSize = 10;
+  static const int pageSize = 3;
   DocumentSnapshot? _lastDocumentSnapshot;
 
   JobNotifier(this._db) : super([]);
@@ -41,13 +41,20 @@ class JobNotifier extends StateNotifier<List<Job>> {
 
   /// Cuenta el total de trabajos disponibles para trabajadores
   /// Filtra trabajos con estado "Buscando profesional"
-  Future<int> countAvailableJobsForWorkers() async {
+  Future<int> countAvailableJobsForWorkers(List<String>? professionIds) async {
     try {
       final jobsCollection = _db.collection('trabajos');
-      final query = jobsCollection.where(
+
+      Query query = jobsCollection.where(
         'status',
         isEqualTo: 'Buscando profesional',
       );
+
+      // Filtro de oficios (igual que en getAvailableJobsForWorkers)
+      if (professionIds != null && professionIds.isNotEmpty) {
+        query = query.where('relatedOffice', whereIn: professionIds);
+      }
+
       final snapshot = await query.count().get();
       return snapshot.count ?? 0;
     } catch (e) {
@@ -61,7 +68,7 @@ class JobNotifier extends StateNotifier<List<Job>> {
       final jobsCollection = _db.collection('trabajos');
       final query = jobsCollection.where(
         'workerId',
-        isEqualTo: _currentClientId,
+        isEqualTo: _currentClientId!.uid,
       );
       final snapshot = await query.count().get();
       return snapshot.count ?? 0;
@@ -85,7 +92,6 @@ class JobNotifier extends StateNotifier<List<Job>> {
         'workerId',
         isEqualTo: _currentClientId!.uid,
       );
-
 
       query = query.limit(pageSize);
 
@@ -134,10 +140,7 @@ class JobNotifier extends StateNotifier<List<Job>> {
       );
 
       if (professionIds != null && professionIds.isNotEmpty) {
-        query = query.where(
-          'relatedOffice',
-          whereIn: professionIds,
-        );
+        query = query.where('relatedOffice', whereIn: professionIds);
       }
 
       query = query.limit(pageSize);
@@ -198,19 +201,28 @@ class JobNotifier extends StateNotifier<List<Job>> {
   }
 }
 
-final jobProvider = StateNotifierProvider<JobNotifier, List<Job>>((ref) { final db = ref.watch(firebaseFirestoreProvider); return JobNotifier(db); });
-
-final publishedJobsProvider = StateNotifierProvider<JobNotifier, List<Job>>((ref) {
+final jobProvider = StateNotifierProvider<JobNotifier, List<Job>>((ref) {
   final db = ref.watch(firebaseFirestoreProvider);
   return JobNotifier(db);
 });
 
-final availableJobsProvider = StateNotifierProvider<JobNotifier, List<Job>>((ref) {
+final publishedJobsProvider = StateNotifierProvider<JobNotifier, List<Job>>((
+  ref,
+) {
   final db = ref.watch(firebaseFirestoreProvider);
   return JobNotifier(db);
 });
 
-final assignedJobsProvider = StateNotifierProvider<JobNotifier, List<Job>>((ref) {
+final availableJobsProvider = StateNotifierProvider<JobNotifier, List<Job>>((
+  ref,
+) {
+  final db = ref.watch(firebaseFirestoreProvider);
+  return JobNotifier(db);
+});
+
+final assignedJobsProvider = StateNotifierProvider<JobNotifier, List<Job>>((
+  ref,
+) {
   final db = ref.watch(firebaseFirestoreProvider);
   return JobNotifier(db);
 });
