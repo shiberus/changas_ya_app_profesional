@@ -153,10 +153,6 @@ class AppLogin extends ConsumerWidget {
                         border: OutlineInputBorder(),
                         labelText: 'Contraseña',
                       ),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (String? password) {
-                        return validation.validatePassword(password);
-                      },
                     ),
                   ),
 
