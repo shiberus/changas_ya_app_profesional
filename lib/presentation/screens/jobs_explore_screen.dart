@@ -1,6 +1,7 @@
 import 'package:changas_ya_app/Domain/Job/job.dart';
 import 'package:changas_ya_app/Domain/Profile/profile.dart';
 import 'package:changas_ya_app/presentation/providers/job_provider.dart';
+import 'package:changas_ya_app/presentation/providers/pagination_providers.dart';
 import 'package:changas_ya_app/presentation/providers/profile_provider.dart';
 import 'package:changas_ya_app/presentation/widgets/job_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -42,9 +43,9 @@ class _JobScreenState extends ConsumerState<JobsExplorerScreen> {
 
     
     final notifier = ref.read(availableJobsProvider.notifier);
-    final count = await notifier.countAvailableJobsForWorkers();
-    ref.read(totalJobsCountProvider.notifier).state = count;
-    ref.read(currentPageProvider.notifier).state = 0;
+    final count = await notifier.countAvailableJobsForWorkers(_profile!.trades);
+    ref.read(exploreJobsTotalProvider.notifier).state = count;
+    ref.read(exploreJobsPageProvider.notifier).state = 0;
     
     _pageCursors.clear();
 
@@ -59,7 +60,7 @@ class _JobScreenState extends ConsumerState<JobsExplorerScreen> {
   }
 
   Future<void> _loadNextPage() async {
-    final currentPage = ref.read(currentPageProvider);
+    final currentPage = ref.read(exploreJobsPageProvider);
     final lastDoc = _pageCursors[currentPage];
     if (lastDoc == null) return;
     
@@ -73,7 +74,7 @@ class _JobScreenState extends ConsumerState<JobsExplorerScreen> {
     // Almacena el último snapshot de documento de la nueva página
     final notifier = ref.read(availableJobsProvider.notifier);
     _pageCursors.add(notifier.lastDocumentSnapshot);
-    ref.read(currentPageProvider.notifier).state = currentPage + 1;
+    ref.read(exploreJobsPageProvider.notifier).state = currentPage + 1;
     
     if (mounted) {
       setState(() => _isLoading = false);
@@ -81,7 +82,7 @@ class _JobScreenState extends ConsumerState<JobsExplorerScreen> {
   }
 
   Future<void> _loadPreviousPage() async {
-    final currentPage = ref.read(currentPageProvider);
+    final currentPage = ref.read(exploreJobsPageProvider);
     if (currentPage <= 0) return;
     
     setState(() => _isLoading = true);
@@ -99,7 +100,7 @@ class _JobScreenState extends ConsumerState<JobsExplorerScreen> {
     
     // Elimina el cursor de la página actual ya que estamos retrocediendo
     _pageCursors.removeLast();
-    ref.read(currentPageProvider.notifier).state = currentPage - 1;
+    ref.read(exploreJobsPageProvider.notifier).state = currentPage - 1;
     
     if (mounted) {
       setState(() => _isLoading = false);
@@ -107,15 +108,15 @@ class _JobScreenState extends ConsumerState<JobsExplorerScreen> {
   }
 
   void _goToPreviousPage() {
-    final currentPage = ref.read(currentPageProvider);
+    final currentPage = ref.read(exploreJobsPageProvider);
     if (currentPage > 0) {
       _loadPreviousPage();
     }
   }
 
   void _goToNextPage() {
-    final currentPage = ref.read(currentPageProvider);
-    final totalCount = ref.read(totalJobsCountProvider);
+    final currentPage = ref.read(exploreJobsPageProvider);
+    final totalCount = ref.read(exploreJobsTotalProvider);
     final totalPages = totalCount != null 
         ? (totalCount / JobNotifier.pageSize).ceil() 
         : null;
@@ -128,8 +129,8 @@ class _JobScreenState extends ConsumerState<JobsExplorerScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Job> jobs = ref.watch(availableJobsProvider);
-    final currentPage = ref.watch(currentPageProvider);
-    final totalCount = ref.watch(totalJobsCountProvider);
+    final currentPage = ref.watch(exploreJobsPageProvider);
+    final totalCount = ref.watch(exploreJobsTotalProvider);
     final totalPages = totalCount != null 
         ? (totalCount / JobNotifier.pageSize).ceil() 
         : null;
