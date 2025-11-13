@@ -86,7 +86,7 @@ class BidDetailsModal extends ConsumerWidget {
 
                   String message = success
                       ? 'Trabajo asignado con éxito!'
-                      : '⚠️ Error: No se pudo asignar el trabajo. Intente de nuevo.';
+                      : 'Error: No se pudo asignar el trabajo.';
 
                   ScaffoldMessenger.of(
                     context,

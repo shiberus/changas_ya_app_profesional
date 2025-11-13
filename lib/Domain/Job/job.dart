@@ -1,5 +1,6 @@
 // lib/domain/job.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class Job {
   final String id;
@@ -42,11 +43,20 @@ class Job {
     return manpower + spares;
   }
 
+  String get formattedDateEnd {
+    if (dateEnd == null) {
+      return 'Fecha no definida';
+    }
+
+    final formatter = DateFormat('dd/MM/yyyy');
+    return formatter.format(dateEnd!);
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       'title': title,
       'status': status,
-      'datePosted': Timestamp.fromDate(datePosted), // DateTime -> Timestamp
+      'datePosted': Timestamp.fromDate(datePosted),
       'imageUrls': imageUrls,
       'clientId': clientId,
       'description': description,
@@ -65,7 +75,6 @@ class Job {
   ) {
     final data = snapshot.data();
 
-    // Función helper para convertir Timestamp a DateTime de forma segura
     DateTime? getDateTime(dynamic field) {
       if (field == null) return null;
       if (field is Timestamp) {
@@ -75,25 +84,20 @@ class Job {
     }
 
     return Job(
-      // id: SIEMPRE se toma del ID del documento, no de un campo interno
       id: snapshot.id,
       title: data?['title'] ?? 'Sin título',
       status: data?['status'] ?? 'Desconocido',
 
-      // Conversión de Timestamp a DateTime. Usamos una aserción '!' porque 'datePosted' es requerido.
       datePosted: getDateTime(data?['datePosted'])!,
 
-      // Conversión segura de la lista
       imageUrls: List<String>.from(data?['imageUrls'] ?? []),
 
       clientId: data?['clientId'] ?? '',
       description: data?['description'] ?? '',
 
-      // Presupuestos (manejo seguro de double)
       budgetManpower: data?['budgetManpower']?.toDouble(),
       budgetSpares: data?['budgetSpares']?.toDouble(),
 
-      // Campos opcionales
       workerId: data?['workerId'],
       dateStart: getDateTime(data?['dateStart']),
       dateEnd: getDateTime(data?['dateEnd']),

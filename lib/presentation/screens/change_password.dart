@@ -13,62 +13,61 @@ class ChangePassword extends ConsumerWidget {
   const ChangePassword({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Controllers for the text inputs and value storage attributes.
+    late TextEditingController emailController = TextEditingController();
+    late TextEditingController oldPasswordController = TextEditingController();
+    late TextEditingController newPasswordController = TextEditingController();
+    late TextEditingController confirmedNewPasswordController =
+        TextEditingController();
+    String inputEmail = '';
+    String inputOldPassword = '';
+    String inputNewPassword = '';
 
-  // Controllers for the text inputs and value storage attributes.
-  late TextEditingController emailController = TextEditingController();
-  late TextEditingController oldPasswordController = TextEditingController();
-  late TextEditingController newPasswordController = TextEditingController();
-  late TextEditingController confirmedNewPasswordController =
-      TextEditingController();
-  String inputEmail = '';
-  String inputOldPassword = '';
-  String inputNewPassword = '';
+    // Intance for validation class.
+    FieldValidation validation = FieldValidation();
 
-  // Intance for validation class.
-  FieldValidation validation = FieldValidation();
+    // Key to indentify the form.
+    final changePasswordFormkey = GlobalKey<FormState>();
 
-  // Key to indentify the form.
-  final changePasswordFormkey = GlobalKey<FormState>();
-
-  // Instance for authentication.
-  final UserAuthController auth = UserAuthController();
+    // Instance for authentication.
+    final UserAuthController auth = UserAuthController();
 
     void snackBarPopUp(String message, Color? background) {
-    SnackBar snackBar = SnackBar(
-      content: Text(message),
-      backgroundColor: background,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  // Validate the password change.
-  Future<bool> validateChange() async {
-    bool isPasswordChanged = false;
-    String snackBarMessage = '';
-    Color? snackBarColor = Colors.red[400];
-
-    if (changePasswordFormkey.currentState!.validate()) {
-      try {
-        await auth.changeUserPassword(
-          inputEmail,
-          inputOldPassword,
-          inputNewPassword,
-        );
-        snackBarMessage = '¡Se cambió la contraseña!';
-        snackBarColor = Colors.green[400];
-        isPasswordChanged = true;
-      } on AuthException catch (e) {
-        snackBarMessage = e.showErrorMessage();
-      }
-    } else {
-      snackBarMessage = 'Ocurrió un problema...';
-      snackBarColor = Colors.red[400];
+      SnackBar snackBar = SnackBar(
+        content: Text(message),
+        backgroundColor: background,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
-    snackBarPopUp(snackBarMessage, snackBarColor);
-    return isPasswordChanged;
-  }
-  
+    // Validate the password change.
+    Future<bool> validateChange() async {
+      bool isPasswordChanged = false;
+      String snackBarMessage = '';
+      Color? snackBarColor = Colors.red[400];
+
+      if (changePasswordFormkey.currentState!.validate()) {
+        try {
+          await auth.changeUserPassword(
+            inputEmail,
+            inputOldPassword,
+            inputNewPassword,
+          );
+          snackBarMessage = '¡Se cambió la contraseña!';
+          snackBarColor = Colors.green[400];
+          isPasswordChanged = true;
+        } on AuthException catch (e) {
+          snackBarMessage = e.showErrorMessage();
+        }
+      } else {
+        snackBarMessage = 'Ocurrió un problema...';
+        snackBarColor = Colors.red[400];
+      }
+
+      snackBarPopUp(snackBarMessage, snackBarColor);
+      return isPasswordChanged;
+    }
+
     // Insets for text field alignment
     final EdgeInsets textFieldsInset = EdgeInsets.symmetric(
       vertical: 10.0,
@@ -133,7 +132,7 @@ class ChangePassword extends ConsumerWidget {
                       controller: oldPasswordController,
                       onChanged: (String passwordValue) {
                         if (oldPasswordController.text.isNotEmpty) {
-                            inputOldPassword = oldPasswordController.text;
+                          inputOldPassword = oldPasswordController.text;
                         }
                       },
                       obscureText: true,
@@ -155,7 +154,7 @@ class ChangePassword extends ConsumerWidget {
                       controller: newPasswordController,
                       onChanged: (String newPasswordValue) {
                         if (newPasswordController.text.isNotEmpty) {
-                            inputNewPassword = newPasswordController.text;
+                          inputNewPassword = newPasswordController.text;
                         }
                       },
                       obscureText: true,
@@ -196,10 +195,10 @@ class ChangePassword extends ConsumerWidget {
                   SizedBox(height: 20.0),
 
                   ElevatedButton(
-                    onPressed: ()  async {
+                    onPressed: () async {
                       bool passwordChanged = await validateChange();
-                    
-                      if (passwordChanged && context.mounted){
+
+                      if (passwordChanged && context.mounted) {
                         context.push('/');
                       }
                     },
