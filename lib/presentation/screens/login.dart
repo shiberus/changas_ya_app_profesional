@@ -14,6 +14,7 @@ class AppLogin extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     final userAuthenticated = ref.watch(authStateChangesProvider);
 
     late TextEditingController emailController = TextEditingController();
@@ -61,8 +62,12 @@ class AppLogin extends ConsumerWidget {
 
 
     return userAuthenticated.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      skipLoadingOnRefresh: false,
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator()
+        )
+      ),
       error: (error, stackTrace) => Scaffold(
         body: Center(
           child: AlertDialog(
@@ -71,9 +76,9 @@ class AppLogin extends ConsumerWidget {
             content: Text("Ocurrió un error al carga la sesión anterior"),
             actions: [
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.pop(context);
-                  auth.userLogOut();
+                  await auth.userLogOut();
                   Navigator.popAndPushNamed(context, "/login");
                 },
                 child: Text("Ok"),
