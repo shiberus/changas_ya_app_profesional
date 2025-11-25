@@ -27,7 +27,10 @@ class _JobScreenState extends ConsumerState<JobsExplorerScreen> {
   @override
   void initState() {
     super.initState();
-    _loadInitialData();
+    final user = FirebaseAuth.instance.currentUser;
+    if(user != null){
+      _loadInitialData();
+    }
   }
 
   @override

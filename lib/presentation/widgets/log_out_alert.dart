@@ -1,14 +1,16 @@
+import 'package:changas_ya_app/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:changas_ya_app/core/Services/user_auth_controller.dart';
 import 'package:changas_ya_app/Domain/Auth_exception/auth_exception.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class LogOutAlert extends StatelessWidget {
+class LogOutAlert extends ConsumerWidget {
   LogOutAlert({super.key});
   final UserAuthController authController = UserAuthController();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
     void snackBarPopUp(String message, Color? background) {
       SnackBar snackBar = SnackBar(
@@ -64,6 +66,7 @@ class LogOutAlert extends StatelessWidget {
             onPressed: () async {
               bool isClosed = await userLogOut(context);
               if (context.mounted && isClosed) {
+                ref.invalidate(authStateChangesProvider);
                 Navigator.pop(context);
                 context.go("/login");
               }

@@ -26,7 +26,7 @@ class RatingChip extends ConsumerWidget {
       data: (rating) {
         return Chip(
           label: Text(
-            'Cal. $rating',
+            'Cal. ${rating.toStringAsFixed(1)}',
             style: const TextStyle(fontSize: 12, color: Colors.white),
           ),
           backgroundColor: Colors.green.shade500,
