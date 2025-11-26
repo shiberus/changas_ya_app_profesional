@@ -17,6 +17,16 @@ class ProfileScreen extends ConsumerWidget {
       );
     }
 
+    dynamic profileImage = AssetImage("lib/image/profile_avatar_anonymous_user.png");
+    final userImage = user.getFotoUrl();
+    if (userImage.isNotEmpty){
+      if (userImage.contains('://')){
+        profileImage = NetworkImage(userImage);
+      } else {
+        profileImage = AssetImage(userImage);
+      }
+    }
+
     final textStyle = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -28,7 +38,7 @@ class ProfileScreen extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 60,
-              backgroundImage: AssetImage(user.getFotoUrl()),
+              backgroundImage: profileImage,
             ),
 
             const SizedBox(height: 20),
