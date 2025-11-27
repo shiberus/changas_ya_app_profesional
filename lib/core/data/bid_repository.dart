@@ -31,8 +31,6 @@ class BidRepository {
     
     await _db
         .collection(_collectionName)
-        .doc(jobId)
-        .collection('bids')
         .add(bidData); 
   }
 

@@ -44,7 +44,7 @@ class SignUp extends ConsumerWidget {
     Future<bool> submitRegister() async {
       String snackBarMessage = '';
       Color? snackBarColor = Colors.red[400];
-      bool userIsWorker = false;
+      bool userIsWorker = true;
       bool registerSucced = false;
       String emptyUserId = '';
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:changas_ya_app/Domain/Bid/bid.dart';
+import 'package:changas_ya_app/Domain/Job/job.dart';
 import 'package:changas_ya_app/presentation/providers/job_provider.dart';
 import 'package:changas_ya_app/presentation/widgets/profile_card.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +87,7 @@ class BidDetailsModal extends ConsumerWidget {
 
                   String message = success
                       ? 'Trabajo asignado con éxito!'
-                      : '⚠️ Error: No se pudo asignar el trabajo. Intente de nuevo.';
+                      : 'Error: No se pudo asignar el trabajo.';
 
                   ScaffoldMessenger.of(
                     context,

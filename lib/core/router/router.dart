@@ -8,6 +8,7 @@ import 'package:changas_ya_app/presentation/screens/sign_up.dart';
 import 'package:changas_ya_app/presentation/screens/change_password.dart';
 import 'package:changas_ya_app/presentation/screens/profile_screen.dart';
 import 'package:changas_ya_app/presentation/screens/nosotros_screen.dart';
+import 'package:changas_ya_app/presentation/screens/edit_profile.dart';
 import 'package:go_router/go_router.dart';
 
 final appRouter = GoRouter(
@@ -22,6 +23,11 @@ final appRouter = GoRouter(
       path: '/signup',
       name: SignUp.name,
       builder: (context, state) => const SignUp(),
+    ),
+    GoRoute(
+      path: '/editProfile',
+      name: 'edit_profile',
+      builder: (context, state) => const EditProfileScreen(),
     ),
     GoRoute(
       path: '/nosotros',

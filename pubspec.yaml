@@ -71,6 +71,7 @@ flutter:
     - lib/images/change_password_banner.png
     - lib/images/profile_banner.png
     - lib/images/profile_placeholder.png
+    - lib/images/profile_avatar_anonymous_user.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

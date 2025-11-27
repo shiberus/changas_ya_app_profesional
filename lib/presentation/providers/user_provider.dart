@@ -1,31 +1,50 @@
 import 'package:flutter_riverpod/legacy.dart';
 import '../../Domain/User/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 
-// Provider legacy
-final userProvider = StateNotifierProvider<UserNotifier, User?>(
-  (ref) => UserNotifier(),
-);
+final userProvider = StateNotifierProvider<UserNotifier, User?>((ref) {
+  return UserNotifier();
+});
 
 class UserNotifier extends StateNotifier<User?> {
   UserNotifier() : super(null) {
     loadUserData();
   }
 
-  void loadUserData() {
-    // Simula la carga de datos (más adelante reemplazar por Firebase)
-    state = getMockUser();
-  }
-}
+  Future<void> loadUserData() async {
+    final fbUser = fb.FirebaseAuth.instance.currentUser;
 
-// Función que devuelve un usuario mock
-User getMockUser() {
-  User user = User('Juan Pérez', 'juanperez@gmail.com', '123456');
-  user.setTelefono('+54 9 11 1234-5678');
-  user.setDireccion('Av. Siempre Viva 742');
-  user.setFotoUrl('lib/images/profile_placeholder.png');
-  user.setOpiniones([
-    Opinion('Excelente servicio', 5),
-    Opinion('Muy cumplidor', 4),
-  ]);                                        
-  return user;                     
+    if (fbUser == null) {
+      state = null;
+      return;
+    }
+
+    final uid = fbUser.uid;
+
+    // Buscamos el doc en Firestore
+    final doc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(uid)
+        .get();
+
+    if (!doc.exists) {
+      state = null;
+      return;
+    }
+
+    final data = doc.data()!;
+
+    final user = User(
+      data['name'] ?? fbUser.displayName ?? '',
+      fbUser.email ?? '',
+      '',
+    );
+
+    user.setTelefono(data['phone'] ?? '');
+    user.setDireccion(data['address'] ?? '');
+    user.setFotoUrl(data['photoUrl'] ?? '');
+
+    state = user;
+  }
 }
